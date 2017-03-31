@@ -132,4 +132,6 @@
 	<Include file="map\map.xml"/>
 
 	<Script file="tiptac\tiptac.lua"/>
+
+	<Script file="automator\automator.xml"/>
 </Ui>
