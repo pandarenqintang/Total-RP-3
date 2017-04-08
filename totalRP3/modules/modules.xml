@@ -133,5 +133,5 @@
 
 	<Script file="tiptac\tiptac.lua"/>
 
-	<Script file="automator\automator.xml"/>
+	<Include file="automator\automator.xml"/>
 </Ui>

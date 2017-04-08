@@ -19,43 +19,245 @@
 ----------------------------------------------------------------------------------
 
 -- Public access
-TRP3_API.automator = {
-};
-local Log = TRP3_API.utils.log;
+---@class Automator
+local Automator = {};
+TRP3_API.automator = Automator;
+
+local log = TRP3_API.utils.log.log;
+local registerHandler = TRP3_API.utils.event.registerHandler;
+
+local function logFormat(text, ...)
+	log(text:format(...));
+end
 
 local assert = assert;
+local unpack, strjoin, pairs = unpack, strjoin, pairs;
 
-local automatorModules = {};
+local automatorTriggers = {};
 
----registerModule
----@param moduleStructure table
-function TRP3_API.automator.registerModule(moduleStructure)
-	
-	assert(moduleStructure, "Automator module structure can't be nil");
-	assert(moduleStructure.id, "Illegal module structure. Automator module id: "..moduleStructure.id);
-	assert(not MODULE_REGISTRATION[moduleStructure.id], "This automator module is already register: "..moduleStructure.id);
-	
-	if not moduleStructure.name or not type(moduleStructure.name) == "string" or moduleStructure.name:len() == 0 then
-		moduleStructure.name = moduleStructure.id;
+---registerTrigger
+---@param triggerStructure table
+function Automator.registerTrigger(triggerStructure)
+
+	assert(triggerStructure, "Automator trigger structure can't be nil");
+
+	assert(triggerStructure.id, "Illegal trigger structure. An automator trigger must have an id field!");
+	assert(triggerStructure.testFunction, "Illegal trigger structure. An automator trigger must have a testFunction!");
+
+	assert(not automatorTriggers[triggerStructure.id], "This automator trigger is already register: " .. triggerStructure.id);
+
+	if not triggerStructure.name or not type(triggerStructure.name) == "string" or triggerStructure.name:len() == 0 then
+		triggerStructure.name = triggerStructure.id;
 	end
-	
-	automatorModules[moduleStructure.id] = moduleStructure;
-	
-	Log.log("Module registered: " .. moduleStructure.id);
-	
+
+	automatorTriggers[triggerStructure.id] = triggerStructure;
+
+	logFormat("Trigger registered: %s", triggerStructure.id);
+
+end
+
+local automatorModifications = {};
+
+---registerModification
+---@param modificationStructure table
+function Automator.registerModification(modificationStructure)
+
+	assert(modificationStructure, "Automator modification structure can't be nil");
+
+	assert(modificationStructure.id, "Illegal modification structure. Automator modification must have an id field!");
+	assert(modificationStructure.modificationFunction, "Illegal modification structure. Automator modification must have modificationFunction!");
+
+	assert(not automatorModifications[modificationStructure.id], "This automator modification is already register: " .. modificationStructure.id);
+
+	if not modificationStructure.name or not type(modificationStructure.name) == "string" or modificationStructure.name:len() == 0 then
+		modificationStructure.name = modificationStructure.id;
+	end
+
+	automatorModifications[modificationStructure.id] = modificationStructure;
+
+	logFormat("Modification registered: %s", modificationStructure.id);
+
 end
 
 local function onStart()
-	
+
+	local variations = {
+		{
+			variationName                 = "Color my name blue when shapeshifting into cat form",
+			triggerID                     = "shapeshifting",
+			triggerTestFunctionParameters = { "CAT" },
+			modifications                 = {
+				{
+					modificationID                = "characteristics",
+					modifcationFunctionParameters = { {
+						CH = "5A97BB",
+						IC = "TalentSpec_Druid_Feral_Cat";
+						TI = "Kitty cat"
+					} }
+				}
+			}
+		},
+		{
+			variationName                 = "Color my name blue when shapeshifting into bear form",
+			triggerID                     = "shapeshifting",
+			triggerTestFunctionParameters = { "BEAR" },
+			modifications                 = {
+				{
+					modificationID                = "characteristics",
+					modifcationFunctionParameters = { {
+						CH = "AE592D",
+						IC = "TalentSpec_Druid_Feral_Bear",
+						TI = "Tanky"
+					} }
+				}
+			}
+		},
+		{
+			variationName                 = "Color my name blue when shapeshifting into travel form",
+			triggerID                     = "shapeshifting",
+			triggerTestFunctionParameters = { "TRAVEL" },
+			modifications                 = {
+				{
+					modificationID                = "characteristics",
+					modifcationFunctionParameters = { {
+						CH = "50bb7d",
+						IC = "Ability_Druid_TravelForm",
+						TI = "Swifty"
+					} }
+				}
+			}
+		},
+		{
+			variationName                 = "Color my name blue when shapeshifting into default form",
+			triggerID                     = "shapeshifting",
+			triggerTestFunctionParameters = { "DEFAULT" },
+			modifications                 = {
+				{
+					modificationID                = "characteristics",
+					modifcationFunctionParameters = { {
+						CH = "FF7D0A",
+						IC = "INV_Misc_Herb_JadeTeaLeaf",
+						TI = "Naturalist"
+					} }
+				}
+			}
+		},
+		{
+			variationName                 = "Color my name blue when shapeshifting into default form",
+			triggerID                     = "specialization",
+			triggerTestFunctionParameters = { 4 },
+			modifications                 = {
+				{
+					modificationID                = "characteristics",
+					modifcationFunctionParameters = { {
+						FT = "Healer"
+					} }
+				}
+			}
+		},
+		{
+			variationName                 = "Color my name blue when shapeshifting into default form",
+			triggerID                     = "specialization",
+			triggerTestFunctionParameters = { 2 },
+			modifications                 = {
+				{
+					modificationID                = "characteristics",
+					modifcationFunctionParameters = { {
+						FT = "Feral"
+					} }
+				}
+			}
+		},
+		{
+			variationName                 = "Color my name blue when shapeshifting into default form",
+			triggerID                     = "specialization",
+			triggerTestFunctionParameters = { 3 },
+			modifications                 = {
+				{
+					modificationID                = "characteristics",
+					modifcationFunctionParameters = { {
+						FT = "Guardian"
+					} }
+				}
+			}
+		},
+		{
+			variationName                 = "Color my name blue when shapeshifting into default form",
+			triggerID                     = "equipment_set",
+			triggerTestFunctionParameters = { 2 },
+			modifications                 = {
+				{
+					modificationID                = "characteristics",
+					modifcationFunctionParameters = { {
+						FT = "Avec tabard"
+					} }
+				}
+			}
+		},
+		{
+			variationName                 = "Color my name blue when shapeshifting into default form",
+			triggerID                     = "equipment_set",
+			triggerTestFunctionParameters = { 4 },
+			modifications                 = {
+				{
+					modificationID                = "characteristics",
+					modifcationFunctionParameters = { {
+						FT = "Sans tabard"
+					} }
+				}
+			}
+		},
+	}
+
+	for _, variation in pairs(variations) do
+		logFormat("Handling variation: %s", variation.variationName);
+
+		logFormat("Registering events for trigger %s", variation.triggerID);
+		assert(automatorTriggers[variation.triggerID], "Unkown trigger " .. variation.triggerID .. " for variation " .. variation.variationName);
+		local trigger = automatorTriggers[variation.triggerID];
+
+		for _, event in pairs(trigger.events) do
+
+			-- Register a handler for each event
+			registerHandler(event, function(...)
+
+				logFormat("Event %s fired", event)
+				logFormat("Testing trigger %s with parameters %s", variation.triggerID, strjoin(", ", unpack(variation.triggerTestFunctionParameters)));
+
+				-- Check if the
+				if trigger.testFunction(unpack(variation.triggerTestFunctionParameters), ...) then
+
+					logFormat("Trigger %s was true.", variation.triggerID);
+
+					for _, modification in pairs(variation.modifications) do
+						logFormat("Applying modification %s", modification.modificationID);
+						assert(automatorModifications[modification.modificationID],
+							   "Unkown modification executed in variation " .. variation.variationName .. ": " .. modification.modificationID);
+
+						automatorModifications[modification.modificationID].modificationFunction(unpack(modification.modifcationFunctionParameters));
+					end
+
+				else
+
+					logFormat("Trigger %s was false.", variation.triggerID);
+
+				end
+			end )
+
+			logFormat("Registered event %s", event)
+		end
+	end
 end
 
 
--- Register a Total RP 3 module that can be disabled in the settings
-TRP3_API.module.registerModule({
-	["name"] = "Automator",
+-- Register a Total RP 3 trigger that can be disabled in the settings
+TRP3_API.module.registerModule(
+{
+	["name"]        = "Automator",
 	["description"] = "Bring automation to Total RP 3.",
-	["version"] = 0.1,
-	["id"] = "trp3_automator",
-	["onStart"] = onStart,
-	["minVersion"] = 27
-});
+	["version"]     = 0.1,
+	["id"]          = "trp3_automator",
+	["onStart"]     = onStart,
+	["minVersion"]  = 27
+}
+);

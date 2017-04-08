@@ -22,9 +22,11 @@
 
 	<Script file="automator.lua"/>
 
-	<Script file="auras.lua"/>
-	<Script file="equipment_sets.lua"/>
-	<Script file="mercenary.lua"/>
-	<Script file="shapeshifting.lua"/>
-	<Script file="specializations.lua"/>
+	<!--<Script file="triggers/auras.lua"/>-->
+	<Script file="triggers/equipment_sets.lua"/>
+	<!--<Script file="triggers/mercenary.lua"/>-->
+	<Script file="triggers/shapeshifting.lua"/>
+	<Script file="triggers/specializations.lua"/>
+
+	<Script file="modifications/characteristics.lua"/>
 </Ui>
