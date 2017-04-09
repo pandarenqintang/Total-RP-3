@@ -24,9 +24,8 @@ local Automator = TRP3_API.automator;
 local UnitRace, UnitClassBase = UnitRace, UnitClassBase;
 local select = select;
 local GetShapeshiftFormID, GetShapeshiftFormInfo, GetShapeshiftForm = GetShapeshiftFormID, GetShapeshiftFormInfo, GetShapeshiftForm;
-local HasAlternateForm = HasAlternateForm;
 
-local SHAPESHIFT_FORMS = {
+local SHAPESHIFT_FORMS      = {
 	DRUID  = {
 		[1]  = "CAT",
 		[3]  = "TRAVEL",
@@ -46,17 +45,18 @@ local SHAPESHIFT_FORMS = {
 	}
 }
 
-local WORGEN_FORMS     = {
-	WORGEN = "WORGEN",
-	HUMAN  = "HUMAN"
+local SHAPESHIFT_FORM_NAMES = {
+	CAT      = "Cat Form",
+	TRAVEL   = "Travel Form",
+	AQUATIC  = "Aquatic Form",
+	BEAR     = "Bear Form",
+	FLIGHT   = "Flight Form",
+	MOONKIN  = "Moonkin Form",
+	AFFINITY = "Affinity Form",
+	TREANT   = "Treant Form",
 }
 
-local PLAYER_CLASS     = select(2, UnitClassBase("player"));
-local PLAYER_IS_WORGEN = select(2, UnitRace("player")) == "Worgen";
-
-local function playerIsInWorgenForm()
-	return not select(2, HasAlternateForm());
-end
+local PLAYER_CLASS          = select(2, UnitClassBase("player"));
 
 local function getCurrentForm()
 	-- Check if the player is of a class who can shapeshift into a known shapeshift form
@@ -66,9 +66,6 @@ local function getCurrentForm()
 			return SHAPESHIFT_FORMS[PLAYER_CLASS][formID];
 		end
 	end
-	if PLAYER_IS_WORGEN then
-		return playerIsInWorgenForm() and WORGEN_FORMS.WORGEN or WORGEN_FORMS.HUMAN;
-	end
 	return "DEFAULT"
 end
 
@@ -77,12 +74,19 @@ local function testFunction(desiredForm)
 	return desiredForm == getCurrentForm();
 end
 
+---@type ColorMixin
+local variableColor = TRP3_API.utils.color.CreateColor(1, 0.82, 0);
+
 Automator.registerTrigger(
 {
-	["name"]         = "Shapeshifting",
-	["description"]  = "Adapt your profile when shapeshifting",
-	["id"]           = "shapeshifting",
-	["events"]       = { "UPDATE_SHAPESHIFT_FORM" },
-	["testFunction"] = testFunction
+	["name"]          = "Shapeshifting",
+	["description"]   = "Adapt your profile when shapeshifting",
+	["id"]            = "shapeshifting",
+	["events"]        = { "UPDATE_SHAPESHIFT_FORM" },
+	["testFunction"]  = testFunction,
+	["icon"]          = "Ability_Druid_MasterShapeshifter",
+	["listDecorator"] = function(desiredForm)
+		return "When " .. variableColor:WrapTextInColorCode("shapeshifting") .. " into " .. variableColor:WrapTextInColorCode(SHAPESHIFT_FORM_NAMES[desiredForm]) .. ".";
+	end
 }
 );

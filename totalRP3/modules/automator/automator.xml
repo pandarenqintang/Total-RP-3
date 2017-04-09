@@ -19,6 +19,180 @@
 		limitations under the License.
 	-->
 
+	<Frame name="TRP3_AutomatorVariationLine" virtual="true">
+		<Size y="60"/>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture parentKey="BG" atlas="GarrLanding-Mission-InProgress" useAtlasSize="false">
+					<Anchors>
+						<Anchor point="TOPRIGHT"/>
+						<Anchor point="BOTTOMLEFT" />
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="ARTWORK">
+				<Texture parentKey="Icon" file="Interface/ICONS/INV_Misc_QuestionMark">
+					<Size y="50" x="50"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" x="5" y="-5"/>
+					</Anchors>
+				</Texture>
+				<FontString parentKey="Title" inherits="GameFontHighlightLarge" justifyH="LEFT">
+					<Size y="15"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" x="75" y="-15"/>
+						<Anchor point="RIGHT"/>
+					</Anchors>
+					<Color r="1" g="1" b="1"/>
+				</FontString>
+				<FontString parentKey="SubTitle" inherits="GameFontNormal" justifyH="LEFT">
+					<Size x="390" y="0"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeKey="$parent.Title" relativePoint="BOTTOMLEFT" x="0" y="-5"/>
+					</Anchors>
+					<Color r="0.792" g="0.690" b="0.529" a="1"/>
+				</FontString>
+				<FontString parentKey="TimeLeft" inherits="GameFontNormalLarge2" justifyH="RIGHT">
+					<Anchors>
+						<Anchor point="TOPRIGHT" x="-10" y="-7"/>
+					</Anchors>
+				</FontString>
+				<FontString parentKey="Status" inherits="GameFontNormal" justifyH="RIGHT">
+					<Anchors>
+						<Anchor point="BOTTOMRIGHT" x="-10" y="5"/>
+					</Anchors>
+					<Color r="0.792" g="0.690" b="0.529" a="1"/>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame parentKey="highlight" inherits="GlowBorderTemplate" hidden="true" alpha="0.35">
+				<Anchors>
+					<Anchor point="TOPLEFT" x="0" y="0"/>
+					<Anchor point="BOTTOMRIGHT" x="0" y="0"/>
+				</Anchors>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnEnter>
+				self.highlight:Show();
+			</OnEnter>
+			<OnLeave>
+				self.highlight:Hide();
+			</OnLeave>
+		</Scripts>
+	</Frame>
+
+	<Frame name="TRP3_AutomatorList" hidden="true">
+		<Frames>
+			<Frame frameLevel="2" parentKey="list">
+				<Backdrop edgeFile="Interface\Tooltips\UI-Tooltip-Border">
+					<EdgeSize val="17"/>
+				</Backdrop>
+				<Anchors>
+					<Anchor point="TOPRIGHT" x="2" y="0" />
+					<Anchor point="BOTTOMLEFT" x="2" y="0" />
+				</Anchors>
+				<Layers>
+					<Layer level="BORDER">
+						<Texture parentKey="HeaderBar" atlas="GarrLanding-HeaderBar" useAtlasSize="false">
+							<Size y="40"/>
+							<Anchors>
+								<Anchor point="TOPLEFT" x="0" y="-10"/>
+								<Anchor point="RIGHT" />
+							</Anchors>
+						</Texture>
+					</Layer>
+					<Layer level="BORDER">
+						<FontString parentKey="Title" inherits="QuestFont_Enormous" text="Profile variations">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeKey="$parent.$parent.HeaderBar" x="26" y="-15"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+					<Layer level="BACKGROUND">
+						<Texture file="Interface\Garrison\GarrisonLandingPageMiddleTile">
+							<Anchors>
+								<Anchor point="TOPRIGHT" x="-3" y="-3"/>
+								<Anchor point="BOTTOMLEFT" x="3" y="3"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Frames>
+					<Frame name="$parentList" parentKey="list" inherits="TRP3_InnerFrame">
+						<Size x="0" y="340" />
+						<Anchors>
+							<Anchor point="LEFT" x="15" y="0" />
+							<Anchor point="RIGHT" x="-15" y="0" />
+						</Anchors>
+						<Layers>
+							<Layer level="OVERLAY">
+								<FontString name="$parentEmpty" inherits="GameFontNormalLarge" justifyH="LEFT" text="[EMPTY]" hidden="true">
+									<Size x="0" y="10" />
+									<Anchors>
+										<Anchor point="CENTER" x="0" y="0" />
+									</Anchors>
+									<Color r="0.95" g="0.95" b="0.95" />
+								</FontString>
+							</Layer>
+						</Layers>
+						<Frames>
+							<Frame name="$parentLine1" parentKey="line1" inherits="TRP3_AutomatorVariationLine">
+								<Anchors>
+									<Anchor point="TOP" x="0" y="-10" />
+									<Anchor point="LEFT" x="8" y="0" />
+									<Anchor point="RIGHT" x="-22" y="0" />
+								</Anchors>
+							</Frame>
+							<Frame name="$parentLine2" parentKey="line2" inherits="TRP3_AutomatorVariationLine">
+								<Anchors>
+									<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentLine1" x="0" y="-5" />
+									<Anchor point="LEFT" x="0" y="0" relativeTo="$parentLine1" />
+									<Anchor point="RIGHT" x="0" y="0" relativeTo="$parentLine1"/>
+								</Anchors>
+							</Frame>
+							<Frame name="$parentLine3" parentKey="line3" inherits="TRP3_AutomatorVariationLine">
+								<Anchors>
+									<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentLine2" x="0" y="-5" />
+									<Anchor point="LEFT" x="0" y="0" relativeTo="$parentLine1" />
+									<Anchor point="RIGHT" x="0" y="0" relativeTo="$parentLine1"/>
+								</Anchors>
+							</Frame>
+							<Frame name="$parentLine4" parentKey="line4" inherits="TRP3_AutomatorVariationLine">
+								<Anchors>
+									<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentLine3" x="0" y="-5" />
+									<Anchor point="LEFT" x="0" y="0" relativeTo="$parentLine1" />
+									<Anchor point="RIGHT" x="0" y="0" relativeTo="$parentLine1"/>
+								</Anchors>
+							</Frame>
+							<Frame name="$parentLine5" parentKey="line5" inherits="TRP3_AutomatorVariationLine">
+								<Anchors>
+									<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentLine4" x="0" y="-5" />
+									<Anchor point="LEFT" x="0" y="0" relativeTo="$parentLine1" />
+									<Anchor point="RIGHT" x="0" y="0" relativeTo="$parentLine1"/>
+								</Anchors>
+							</Frame>
+							<Slider name="$parentSlider" parentKey="slider" inherits="TRP3_Scrollbar" />
+						</Frames>
+					</Frame>
+					<Button name="$parentAdd" inherits="UIPanelButtonTemplate" text="Add a new variation">
+						<Size x="150" y="25" />
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentList" x="0" y="-10" />
+						</Anchors>
+					</Button>
+					<Button name="$parentInfo" inherits="TRP3_HelpButton" hidden="true">
+						<Size x="15" y="15" />
+						<Anchors>
+							<Anchor point="BOTTOMRIGHT" relativePoint="TOPRIGHT" relativeTo="$parentList" x="3" y="8" />
+						</Anchors>
+					</Button>
+				</Frames>
+			</Frame>
+		</Frames>
+	</Frame>
+
 
 	<Script file="automator.lua"/>
 
@@ -26,6 +200,7 @@
 	<Script file="triggers/equipment_sets.lua"/>
 	<!--<Script file="triggers/mercenary.lua"/>-->
 	<Script file="triggers/shapeshifting.lua"/>
+	<Script file="triggers/worgen.lua"/>
 	<Script file="triggers/specializations.lua"/>
 
 	<Script file="modifications/characteristics.lua"/>

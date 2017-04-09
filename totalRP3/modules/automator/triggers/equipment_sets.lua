@@ -45,12 +45,20 @@ local function testFunction(equipmentTest, wasSuccessfullyEquiped, equipmentSetI
 	return wasSuccessfullyEquiped and equipmentTest == equipmentSetID
 end
 
+---@type ColorMixin
+local variableColor = TRP3_API.utils.color.CreateColor(1, 0.82, 0);
+
 Automator.registerTrigger(
 {
 	["name"]         = "Equipment sets",
 	["description"]  = "Adapt your profile when switching equipment sets",
 	["id"]           = "equipment_set",
 	["events"]       = { "EQUIPMENT_SWAP_FINISHED" },
-	["testFunction"] = testFunction
+	["testFunction"] = testFunction,
+	["icon"]         = "inv_misc_legarmorkit",
+	["listDecorator"] = function(desiredEquipmentSetID)
+		local name, iconFileID, setID, isEquipped = GetEquipmentSetInfo(desiredEquipmentSetID);
+		return "When " .. variableColor:WrapTextInColorCode("switching equipment set") .. " to " .. variableColor:WrapTextInColorCode(name or UNKNOWN) .. ".";
+	end
 }
 );

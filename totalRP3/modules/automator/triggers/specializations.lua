@@ -27,6 +27,8 @@ local GetNumSpecializations = GetNumSpecializations;
 local UnitSex = UnitSex;
 local tinsert = tinsert;
 
+local sex = UnitSex("player");
+
 local function getAvailableSpecializations()
 	local availableSpecializations = {};
 	local sex = UnitSex("player");
@@ -47,12 +49,20 @@ local function testFunction(spec)
 	return spec == GetSpecialization();
 end
 
+---@type ColorMixin
+local variableColor = TRP3_API.utils.color.CreateColor(1, 0.82, 0);
+
 Automator.registerTrigger(
 {
-	["name"]         = "Specializations",
-	["description"]  = "Adapt your profile when you switch specializations.",
-	["id"]           = "specialization",
-	["events"]       = { "ACTIVE_TALENT_GROUP_CHANGED" },
-	["testFunction"] = testFunction
+	["name"]          = "Specializations",
+	["description"]   = "Adapt your profile when you switch specializations.",
+	["id"]            = "specialization",
+	["events"]        = { "ACTIVE_TALENT_GROUP_CHANGED" },
+	["testFunction"]  = testFunction,
+	["icon"]          = "Inv_7XP_Inscription_TalentTome02",
+	["listDecorator"] = function(desiredSpecID)
+		local id, name, description, icon, background, role = GetSpecializationInfo(desiredSpecID, nil, nil, nil, sex);
+		return "When " .. variableColor:WrapTextInColorCode("switching specialization") .. " to " .. variableColor:WrapTextInColorCode(name or UNKNOWN) .. ".";
+	end
 }
 );

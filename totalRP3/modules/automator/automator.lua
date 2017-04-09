@@ -24,7 +24,6 @@ local Automator = {};
 TRP3_API.automator = Automator;
 
 local log = TRP3_API.utils.log.log;
-local registerHandler = TRP3_API.utils.event.registerHandler;
 
 local function logFormat(text, ...)
 	log(text:format(...));
@@ -81,9 +80,11 @@ end
 
 local function onStart()
 
-	local variations = {
+	local registerHandler = TRP3_API.utils.event.registerHandler;
+
+	local druidVariations = {
 		{
-			variationName                 = "Color my name blue when shapeshifting into cat form",
+			variationName                 = "Kitty",
 			triggerID                     = "shapeshifting",
 			triggerTestFunctionParameters = { "CAT" },
 			modifications                 = {
@@ -98,7 +99,7 @@ local function onStart()
 			}
 		},
 		{
-			variationName                 = "Color my name blue when shapeshifting into bear form",
+			variationName                 = "Bear",
 			triggerID                     = "shapeshifting",
 			triggerTestFunctionParameters = { "BEAR" },
 			modifications                 = {
@@ -113,37 +114,7 @@ local function onStart()
 			}
 		},
 		{
-			variationName                 = "Color my name blue when shapeshifting into travel form",
-			triggerID                     = "shapeshifting",
-			triggerTestFunctionParameters = { "TRAVEL" },
-			modifications                 = {
-				{
-					modificationID                = "characteristics",
-					modifcationFunctionParameters = { {
-						CH = "50bb7d",
-						IC = "Ability_Druid_TravelForm",
-						TI = "Swifty"
-					} }
-				}
-			}
-		},
-		{
-			variationName                 = "Color my name blue when shapeshifting into default form",
-			triggerID                     = "shapeshifting",
-			triggerTestFunctionParameters = { "DEFAULT" },
-			modifications                 = {
-				{
-					modificationID                = "characteristics",
-					modifcationFunctionParameters = { {
-						CH = "FF7D0A",
-						IC = "INV_Misc_Herb_JadeTeaLeaf",
-						TI = "Naturalist"
-					} }
-				}
-			}
-		},
-		{
-			variationName                 = "Color my name blue when shapeshifting into default form",
+			variationName                 = "Healing spec",
 			triggerID                     = "specialization",
 			triggerTestFunctionParameters = { 4 },
 			modifications                 = {
@@ -156,20 +127,7 @@ local function onStart()
 			}
 		},
 		{
-			variationName                 = "Color my name blue when shapeshifting into default form",
-			triggerID                     = "specialization",
-			triggerTestFunctionParameters = { 2 },
-			modifications                 = {
-				{
-					modificationID                = "characteristics",
-					modifcationFunctionParameters = { {
-						FT = "Feral"
-					} }
-				}
-			}
-		},
-		{
-			variationName                 = "Color my name blue when shapeshifting into default form",
+			variationName                 = "Tank spec",
 			triggerID                     = "specialization",
 			triggerTestFunctionParameters = { 3 },
 			modifications                 = {
@@ -182,7 +140,7 @@ local function onStart()
 			}
 		},
 		{
-			variationName                 = "Color my name blue when shapeshifting into default form",
+			variationName                 = "Tanking set",
 			triggerID                     = "equipment_set",
 			triggerTestFunctionParameters = { 2 },
 			modifications                 = {
@@ -195,7 +153,7 @@ local function onStart()
 			}
 		},
 		{
-			variationName                 = "Color my name blue when shapeshifting into default form",
+			variationName                 = "Tanking set",
 			triggerID                     = "equipment_set",
 			triggerTestFunctionParameters = { 4 },
 			modifications                 = {
@@ -206,7 +164,40 @@ local function onStart()
 					} }
 				}
 			}
+		}
+	}
+
+	local variations = {
+		{
+			variationName                 = "In worgen form",
+			triggerID                     = "worgen_form",
+			triggerTestFunctionParameters = { true },
+			modifications                 = {
+				{
+					modificationID                = "characteristics",
+					modifcationFunctionParameters = { {
+						IC = "Ability_Racial_Viciousness",
+						CH = "87939A",
+						RA = "Worgen"
+					} }
+				}
+			}
 		},
+		{
+			variationName                 = "In human form",
+			triggerID                     = "worgen_form",
+			triggerTestFunctionParameters = { false },
+			modifications                 = {
+				{
+					modificationID                = "characteristics",
+					modifcationFunctionParameters = { {
+						IC = "Achievement_Character_Human_Female",
+						CH = "30A3E1",
+						RA = "Human"
+					} }
+				}
+			}
+		}
 	}
 
 	for _, variation in pairs(variations) do
@@ -222,7 +213,7 @@ local function onStart()
 			registerHandler(event, function(...)
 
 				logFormat("Event %s fired", event)
-				logFormat("Testing trigger %s with parameters %s", variation.triggerID, strjoin(", ", unpack(variation.triggerTestFunctionParameters)));
+				logFormat("Testing trigger %s with parameters %s", variation.triggerID, tostring(strjoin(", ", unpack(variation.triggerTestFunctionParameters))));
 
 				-- Check if the
 				if trigger.testFunction(unpack(variation.triggerTestFunctionParameters), ...) then
@@ -247,6 +238,52 @@ local function onStart()
 			logFormat("Registered event %s", event)
 		end
 	end
+
+	---@type ColorMixin
+	local variableColor = TRP3_API.utils.color.CreateColor(1, 0.82, 0);
+	local function onVariationsPageShow()
+		for i, variation in pairs(variations) do
+			if i > 5 then
+				break
+			end
+			local line = _G["TRP3_AutomatorListListLine" .. i];
+			line.Title:SetText(variation.variationName);
+
+			local triggerAction = automatorTriggers[variation.triggerID];
+
+			if triggerAction.listDecorator then
+				line.SubTitle:SetText(triggerAction.listDecorator(unpack(variation.triggerTestFunctionParameters)));
+			else
+				line.SubTitle:SetText("When " .. variableColor:WrapTextInColorCode(triggerAction.name) .. " is " .. variableColor:WrapTextInColorCode(strjoin(", ", unpack(variation.triggerTestFunctionParameters))));
+			end
+
+			if triggerAction.icon then
+				line.Icon:SetTexture("Interface\\ICONS\\" .. triggerAction.icon)
+			end
+		end
+	end
+
+	TRP3_API.navigation.menu.registerMenu(
+	{
+		id         = "main_19_player_automator",
+		text       = "Variations",
+		onSelected = function()
+			TRP3_API.navigation.page.setPage("player_automator");
+		end,
+		isChildOf  = "main_10_player",
+	}
+	);
+
+	TRP3_API.navigation.page.registerPage(
+	{
+		id               = "player_automator",
+		frame            = TRP3_AutomatorList,
+		onPagePostShow   = onVariationsPageShow,
+		tutorialProvider = function()
+			return {};
+		end,
+	}
+	);
 end
 
 
