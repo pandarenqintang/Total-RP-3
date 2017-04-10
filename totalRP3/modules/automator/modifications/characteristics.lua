@@ -20,15 +20,19 @@
 ---@type Automator
 local Automator = TRP3_API.automator;
 local Events = TRP3_API.events;
+local playerID = TRP3_API.globals.player_id;
+local getData = TRP3_API.profile.getData;
+
+local pairs = pairs;
 
 local function modificationFunction(characteristics)
-	local profile = TRP3_API.profile.getData("player");
+	local profile = getData("player");
 
 	for field, value in pairs(characteristics) do
 		profile.characteristics[field] = value;
 	end
 
-	Events.fireEvent(Events.REGISTER_DATA_UPDATED);
+	Events.fireEvent(Events.REGISTER_DATA_UPDATED, playerID, nil, "characteristics");
 end
 
 Automator.registerModification(

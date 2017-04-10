@@ -27,6 +27,11 @@ local pairs, tinsert = pairs, tinsert;
 local GetEquipmentSetIDs = C_EquipmentSet.GetEquipmentSetIDs;
 local GetEquipmentSetInfo = C_EquipmentSet.GetEquipmentSetInfo;
 
+local testFunctionParameters = {
+	targetedEquipmentSetID             = 0,
+	targetEquipmentSetShouldBeEquipped = true
+}
+
 local function listEquipmentSets()
 	local equipmentSets = {};
 	for _, equipmentSetID in pairs(GetEquipmentSetIDs()) do
@@ -41,24 +46,44 @@ local function listEquipmentSets()
 end
 
 
-local function testFunction(equipmentTest, wasSuccessfullyEquiped, equipmentSetID)
-	return wasSuccessfullyEquiped and equipmentTest == equipmentSetID
+local function testFunction(testFunctionParameters, eventParameters)
+	local equipmentSetWasSuccessfullyEquipped = eventParameters[2];
+	if not equipmentSetWasSuccessfullyEquipped then
+		return false
+	end
+	local equippedSetID = eventParameters[2];
+
+	local targetEquipmentSetIsEquipped = testFunctionParameters.targetedEquipmentSetID == equippedSetID;
+
+	return targetEquipmentSetIsEquipped == testFunctionParameters.targetEquipmentSetShouldBeEquipped;
 end
 
 ---@type ColorMixin
 local variableColor = TRP3_API.utils.color.CreateColor(1, 0.82, 0);
 
+local function listDecorator(testFunctionParameters)
+	local name, iconFileID, setID, isEquipped = GetEquipmentSetInfo(testFunctionParameters.targetedEquipmentSetID);
+
+	local conditionText = testFunctionParameters.targetEquipmentSetShouldBeEquipped and "equip" or "unequip";
+
+	if not name then
+		name = "Unknown equipment set"
+	end
+
+	return ("When you %s equipment set %s."):format(
+	variableColor:WrapTextInColorCode(conditionText),
+	variableColor:WrapTextInColorCode(name)
+	);
+end
+
 Automator.registerTrigger(
 {
-	["name"]         = "Equipment sets",
-	["description"]  = "Adapt your profile when switching equipment sets",
-	["id"]           = "equipment_set",
-	["events"]       = { "EQUIPMENT_SWAP_FINISHED" },
-	["testFunction"] = testFunction,
-	["icon"]         = "inv_misc_legarmorkit",
-	["listDecorator"] = function(desiredEquipmentSetID)
-		local name, iconFileID, setID, isEquipped = GetEquipmentSetInfo(desiredEquipmentSetID);
-		return "When " .. variableColor:WrapTextInColorCode("switching equipment set") .. " to " .. variableColor:WrapTextInColorCode(name or UNKNOWN) .. ".";
-	end
+	["name"]          = "Equipment sets",
+	["description"]   = "Adapt your profile when switching equipment sets",
+	["id"]            = "equipment_set",
+	["events"]        = { "EQUIPMENT_SWAP_FINISHED" },
+	["testFunction"]  = testFunction,
+	["icon"]          = "inv_misc_legarmorkit",
+	["listDecorator"] = listDecorator
 }
 );

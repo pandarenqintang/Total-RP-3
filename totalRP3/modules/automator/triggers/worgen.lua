@@ -25,27 +25,39 @@ local UnitRace, UnitClassBase = UnitRace, UnitClassBase;
 local select = select;
 local HasAlternateForm = HasAlternateForm;
 
-
-local function testFunction(shouldBeInWorgenForm)
-	return shouldBeInWorgenForm == not select(2, HasAlternateForm());
+local testFunctionParameters = {
+	shouldBeInWorgenForm = true
+}
+local function testFunction(testFunctionParameters)
+	return testFunctionParameters.shouldBeInWorgenForm == not select(2, HasAlternateForm());
 end
 
 ---@type ColorMixin
 local variableColor = TRP3_API.utils.color.CreateColor(1, 0.82, 0);
+
+local function listDecorator(testFunctionParameters)
+	local desiredForm = testFunctionParameters.shouldBeInWorgenForm and "a worgen" or "a human";
+
+	return ("When you %s into %s"):format(
+	variableColor:WrapTextInColorCode("you transform"),
+	variableColor:WrapTextInColorCode(desiredForm)
+	);
+end
+
+local function isAvailable()
+	return select(2, UnitRace("player")) == "Worgen";
+end
 
 Automator.registerTrigger(
 {
 	["name"]          = "Worgen form",
 	["description"]   = "Adapt your profile when going into your human or your worgen form",
 	["id"]            = "worgen_form",
-	["events"]        = { "UNIT_PORTRAIT_UPDATE" },
-	["testFunction"]  = testFunction,
 	["icon"]          = "achievement_worganhead",
-	["listDecorator"] = function(shouldBeInWorgenForm)
-		return "When " .. variableColor:WrapTextInColorCode("you transform") .. " into " .. variableColor:WrapTextInColorCode(shouldBeInWorgenForm and "a worgen" or "a human");
-	end,
-	["available"]     = function()
-		return select(2, UnitRace("player")) == "Worgen";
-	end
+	["events"]        = { "UNIT_PORTRAIT_UPDATE" },
+
+	["testFunction"]  = testFunction,
+	["listDecorator"] = listDecorator,
+	["isAvailable"]   = isAvailable
 }
 );

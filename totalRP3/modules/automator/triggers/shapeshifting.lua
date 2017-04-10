@@ -69,13 +69,28 @@ local function getCurrentForm()
 	return "DEFAULT"
 end
 
-
-local function testFunction(desiredForm)
-	return desiredForm == getCurrentForm();
+local testFunctionParameters = {
+	desiredForm = 1
+}
+local function testFunction(testFunctionParameters)
+	return testFunctionParameters.desiredForm == getCurrentForm();
 end
 
 ---@type ColorMixin
 local variableColor = TRP3_API.utils.color.CreateColor(1, 0.82, 0);
+
+local function listDecorator(testFunctionParameters)
+	local formName = SHAPESHIFT_FORM_NAMES[testFunctionParameters.desiredForm] or "Unknown shapeshift form";
+
+	return ("When %s into %s."):format(
+	variableColor:WrapTextInColorCode("shapeshifting"),
+	variableColor:WrapTextInColorCode(formName)
+	);
+end
+
+local function isAvailable()
+	return SHAPESHIFT_FORMS[PLAYER_CLASS] ~= nil;
+end
 
 Automator.registerTrigger(
 {
@@ -83,10 +98,9 @@ Automator.registerTrigger(
 	["description"]   = "Adapt your profile when shapeshifting",
 	["id"]            = "shapeshifting",
 	["events"]        = { "UPDATE_SHAPESHIFT_FORM" },
-	["testFunction"]  = testFunction,
 	["icon"]          = "Ability_Druid_MasterShapeshifter",
-	["listDecorator"] = function(desiredForm)
-		return "When " .. variableColor:WrapTextInColorCode("shapeshifting") .. " into " .. variableColor:WrapTextInColorCode(SHAPESHIFT_FORM_NAMES[desiredForm]) .. ".";
-	end
+	["testFunction"]  = testFunction,
+	["listDecorator"] = listDecorator,
+	["isAvailable"] = isAvailable
 }
 );

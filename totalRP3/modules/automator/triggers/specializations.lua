@@ -29,6 +29,12 @@ local tinsert = tinsert;
 
 local sex = UnitSex("player");
 
+---Shortcut to GetSpecializationInfo(specID, isInspect, isPet, inspectTarget, gender) with the all the other parameters already populated.
+---@param specializationID number
+local function getPlayerSpecializationInfo(specializationID)
+	return GetSpecializationInfo(specializationID, nil, nil, nil, sex)
+end
+
 local function getAvailableSpecializations()
 	local availableSpecializations = {};
 	local sex = UnitSex("player");
@@ -45,12 +51,27 @@ local function getAvailableSpecializations()
 	end
 end
 
-local function testFunction(spec)
-	return spec == GetSpecialization();
+local testFunctionParameters = {
+	targetedSpecializationID = 1
+}
+---@param testFunctionParameters table
+local function testFunction(testFunctionParameters)
+	return testFunctionParameters.targetedSpecializationID == GetSpecialization();
 end
 
 ---@type ColorMixin
 local variableColor = TRP3_API.utils.color.CreateColor(1, 0.82, 0);
+
+local function listDecorator(testFunctionParameters)
+	local id, name, description, icon, background, role = getPlayerSpecializationInfo(testFunctionParameters.targetedSpecializationID);
+
+	if not name then name = UNKNOWN end
+
+	return ("When you %s to your %s specialization."):format(
+	variableColor:WrapTextInColorCode("switching specialization"),
+	variableColor:WrapTextInColorCode(name)
+	);
+end
 
 Automator.registerTrigger(
 {
@@ -58,11 +79,8 @@ Automator.registerTrigger(
 	["description"]   = "Adapt your profile when you switch specializations.",
 	["id"]            = "specialization",
 	["events"]        = { "ACTIVE_TALENT_GROUP_CHANGED" },
-	["testFunction"]  = testFunction,
 	["icon"]          = "Inv_7XP_Inscription_TalentTome02",
-	["listDecorator"] = function(desiredSpecID)
-		local id, name, description, icon, background, role = GetSpecializationInfo(desiredSpecID, nil, nil, nil, sex);
-		return "When " .. variableColor:WrapTextInColorCode("switching specialization") .. " to " .. variableColor:WrapTextInColorCode(name or UNKNOWN) .. ".";
-	end
+	["testFunction"]  = testFunction,
+	["listDecorator"] = listDecorator
 }
 );

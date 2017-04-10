@@ -207,35 +207,41 @@ local function onStart()
 		assert(automatorTriggers[variation.triggerID], "Unkown trigger " .. variation.triggerID .. " for variation " .. variation.variationName);
 		local trigger = automatorTriggers[variation.triggerID];
 
-		for _, event in pairs(trigger.events) do
+		if trigger.isAvailable and not trigger.isAvailable() then
+			logFormat("Ignored trigger %s as it is not available for this character", trigger.name);
 
-			-- Register a handler for each event
-			registerHandler(event, function(...)
+		else
+			for _, event in pairs(trigger.events) do
 
-				logFormat("Event %s fired", event)
-				logFormat("Testing trigger %s with parameters %s", variation.triggerID, tostring(strjoin(", ", unpack(variation.triggerTestFunctionParameters))));
+				-- Register a handler for each event
+				registerHandler(event, function(...)
 
-				-- Check if the
-				if trigger.testFunction(unpack(variation.triggerTestFunctionParameters), ...) then
+					logFormat("Event %s fired", event)
+					logFormat("Testing trigger %s with parameters %s", variation.triggerID, tostring(strjoin(", ", unpack(variation.triggerTestFunctionParameters))));
 
-					logFormat("Trigger %s was true.", variation.triggerID);
+					-- Check if the trigger condition is validated
+					-- We pass the function parameters defined in the variation and also the event parameters
+					if trigger.testFunction(variation.triggerTestFunctionParameters, {...}) then
 
-					for _, modification in pairs(variation.modifications) do
-						logFormat("Applying modification %s", modification.modificationID);
-						assert(automatorModifications[modification.modificationID],
-							   "Unkown modification executed in variation " .. variation.variationName .. ": " .. modification.modificationID);
+						logFormat("Trigger %s was true.", variation.triggerID);
 
-						automatorModifications[modification.modificationID].modificationFunction(unpack(modification.modifcationFunctionParameters));
+						for _, modification in pairs(variation.modifications) do
+							logFormat("Applying modification %s", modification.modificationID);
+							assert(automatorModifications[modification.modificationID],
+								   "Unkown modification executed in variation " .. variation.variationName .. ": " .. modification.modificationID);
+
+							automatorModifications[modification.modificationID].modificationFunction(unpack(modification.modifcationFunctionParameters));
+						end
+
+					else
+
+						logFormat("Trigger %s was false.", variation.triggerID);
+
 					end
+				end )
 
-				else
-
-					logFormat("Trigger %s was false.", variation.triggerID);
-
-				end
-			end )
-
-			logFormat("Registered event %s", event)
+				logFormat("Registered event %s", event)
+			end
 		end
 	end
 
@@ -247,6 +253,7 @@ local function onStart()
 				break
 			end
 			local line = _G["TRP3_AutomatorListListLine" .. i];
+
 			line.Title:SetText(variation.variationName);
 
 			local triggerAction = automatorTriggers[variation.triggerID];
@@ -259,6 +266,13 @@ local function onStart()
 
 			if triggerAction.icon then
 				line.Icon:SetTexture("Interface\\ICONS\\" .. triggerAction.icon)
+			end
+
+			if triggerAction.isAvailable and not triggerAction.isAvailable() then
+				--TODO Tooltip about how the trigger is not available for this character
+				line.Icon:SetVertexColor(1, 0, 0);
+			else
+				line.Icon:SetVertexColor(1, 1, 1);
 			end
 		end
 	end
