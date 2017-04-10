@@ -211,7 +211,9 @@ local function onStart()
 			logFormat("Ignored trigger %s as it is not available for this character", trigger.name);
 
 		else
-			for _, event in pairs(trigger.events) do
+			local events = trigger.events or variations.triggerTestFunctionParameters.events or {};
+
+			for _, event in pairs(events) do
 
 				-- Register a handler for each event
 				registerHandler(event, function(...)
