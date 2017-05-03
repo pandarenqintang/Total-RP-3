@@ -35,6 +35,7 @@ local setupFieldSet = TRP3_API.ui.frame.setupFieldPanel;
 local showPopup = TRP3_API.popup.showPopup;
 local hasProfile = TRP3_API.register.hasProfile;
 local refreshTooltip = TRP3_API.ui.tooltip.refresh;
+local resolveIcon = TRP3_API.utils.str.resolveIcon;
 local compressData;
 
 --*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -214,7 +215,7 @@ local GLANCE_NOT_USED_ICON = "INV_Misc_QuestionMark";
 local function setupGlanceButton(button, active, icon, title, text, isMine)
 	button:Enable();
 	button.isCurrentMine = isMine;
-	button:SetNormalTexture("Interface\\ICONS\\" .. (icon or GLANCE_NOT_USED_ICON));
+	button:SetNormalTexture(resolveIcon(icon or GLANCE_NOT_USED_ICON));
 	if active then
 		button:SetAlpha(1);
 		if not isMine then
@@ -264,7 +265,7 @@ function TRP3_API.register.getGlanceIconTextures(dataTab, size)
 	for i=1, 5, 1 do
 		local index = tostring(i);
 		if dataTab[index] and dataTab[index].AC then
-			text = text .. "|TInterface\\ICONS\\".. (dataTab[index].IC or Globals.icons.default) .. ":" .. size .. "|t "
+			text = text .. resolveIcon(dataTab[index].IC or Globals.icons.default) .. ":" .. size .. "|t "
 		end
 	end
 	return text;

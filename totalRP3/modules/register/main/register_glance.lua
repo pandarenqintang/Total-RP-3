@@ -24,6 +24,7 @@ local tostring, _G, pairs, type, tinsert, assert, wipe = tostring, _G, pairs, ty
 local tsize, loc = Utils.table.size, TRP3_API.locale.getText;
 local color, getIcon, tableRemove = Utils.str.color, Utils.str.icon, Utils.table.remove;
 local setTooltipForSameFrame, toast = TRP3_API.ui.tooltip.setTooltipForSameFrame, TRP3_API.ui.tooltip.toast;
+local resolveIcon = TRP3_API.utils.str.resolveIcon;
 local unitIDIsFilteredForMatureContent;
 
 --*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -366,7 +367,7 @@ local function displayGlanceSlots()
 				setTooltipForSameFrame(button);
 			end
 
-			Utils.texture.applyRoundTexture("TRP3_GlanceBarSlot" .. i .. "Image", "Interface\\ICONS\\" .. icon);
+			Utils.texture.applyRoundTexture("TRP3_GlanceBarSlot" .. i .. "Image", resolveIcon(icon));
 			button.isCurrentMine = isCurrentMine;
 		end
 	end
@@ -374,7 +375,7 @@ end
 
 local function onGlanceDragStart(button)
 	if button.isCurrentMine and button.data then
-		SetCursor("Interface\\ICONS\\" .. (button.data.IC or Globals.icons.default));
+		SetCursor(resolveIcon(button.data.IC or Globals.icons.default));
 	end
 end
 TRP3_API.register.glance.onGlanceDragStart = onGlanceDragStart;

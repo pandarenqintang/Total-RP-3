@@ -51,6 +51,7 @@ local unregisterMenu = TRP3_API.navigation.menu.unregisterMenu;
 local ignoreID = TRP3_API.register.ignoreID;
 local buildZoneText = Utils.str.buildZoneText;
 local setupEditBoxesNavigation = TRP3_API.ui.frame.setupEditBoxesNavigation;
+local resolveIcon = Utils.str.resolveIcon;
 
 local showIconBrowser = function(callback)
 	TRP3_API.popup.showPopup(TRP3_API.popup.ICONS, nil, {callback});
@@ -298,8 +299,8 @@ local function setConsultDisplay(context)
 			frame:SetPoint("RIGHT", 0, 0);
 			_G[frame:GetName() .. "LeftText"]:SetText(psychoStructure.LT or "");
 			_G[frame:GetName() .. "RightText"]:SetText(psychoStructure.RT or "");
-			_G[frame:GetName() .. "JaugeLeftIcon"]:SetTexture("Interface\\ICONS\\" .. (psychoStructure.LI or Globals.icons.default));
-			_G[frame:GetName() .. "JaugeRightIcon"]:SetTexture("Interface\\ICONS\\" .. (psychoStructure.RI or Globals.icons.default));
+			_G[frame:GetName() .. "JaugeLeftIcon"]:SetTexture(resolveIcon(psychoStructure.LI or Globals.icons.default));
+			_G[frame:GetName() .. "JaugeRightIcon"]:SetTexture(resolveIcon(psychoStructure.RI or Globals.icons.default));
 			refreshPsycho(frame, value or 3);
 			frame:Show();
 			previous = frame;
@@ -627,8 +628,8 @@ function setEditDisplay()
 			local preset = PSYCHO_PRESETS[psychoStructure.ID] or PSYCHO_PRESETS_UNKOWN;
 			_G[frame:GetName() .. "LeftText"]:SetText(preset.LT or "");
 			_G[frame:GetName() .. "RightText"]:SetText(preset.RT or "");
-			_G[frame:GetName() .. "JaugeLeftIcon"]:SetTexture("Interface\\ICONS\\" .. (preset.LI or Globals.icons.default));
-			_G[frame:GetName() .. "JaugeRightIcon"]:SetTexture("Interface\\ICONS\\" .. (preset.RI or Globals.icons.default));
+			_G[frame:GetName() .. "JaugeLeftIcon"]:SetTexture(resolveIcon(preset.LI or Globals.icons.default));
+			_G[frame:GetName() .. "JaugeRightIcon"]:SetTexture(resolveIcon(preset.RI or Globals.icons.default));
 			setTooltipForSameFrame(_G[frame:GetName() .. "LeftButton"], "TOP", 0, 5, loc("REG_PLAYER_PSYCHO_POINT"), loc("REG_PLAYER_PSYCHO_MORE"):format(preset.LT));
 			setTooltipForSameFrame(_G[frame:GetName() .. "RightButton"], "TOP", 0, 5, loc("REG_PLAYER_PSYCHO_POINT"), loc("REG_PLAYER_PSYCHO_MORE"):format(preset.RT));
 		else

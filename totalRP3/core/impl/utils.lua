@@ -359,10 +359,14 @@ function Utils.str.texture(iconPath, iconSize)
 	return strconcat("|T", iconPath, ":", iconSize, ":", iconSize, "|t");
 end
 
+function Utils.str.resolveIcon(icon)
+	return type(icon) == "number" and icon or "Interface\\ICONS\\" .. icon;
+end
+
 -- Return an texture text tag based on the given icon url and size. Nil safe.
 function Utils.str.icon(iconPath, iconSize)
 	iconPath = iconPath or Globals.icons.default;
-	return Utils.str.texture("Interface\\ICONS\\" .. iconPath, iconSize);
+	return Utils.str.texture(Utils.str.resolveIcon(iconPath), iconSize);
 end
 
 -- Return a color tag based on a letter

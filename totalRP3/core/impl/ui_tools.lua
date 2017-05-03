@@ -41,6 +41,7 @@ local UnitIsPlayer = UnitIsPlayer;
 local getUnitID = TRP3_API.utils.str.getUnitID;
 local numberToHexa = TRP3_API.utils.color.numberToHexa;
 local tcopy = TRP3_API.utils.table.copy;
+local resolveIcon = TRP3_API.utils.str.resolveIcon;
 
 local CONFIG_UI_SOUNDS = "ui_sounds";
 local CONFIG_UI_ANIMATIONS = "ui_animations";
@@ -574,7 +575,8 @@ end
 function TRP3_API.ui.frame.setupIconButton(self, icon)
 	assert(self, "Frame is nil");
 	assert(self.Icon or (self:GetName() and _G[self:GetName() .. "Icon"]), "Frame must have a Icon");
-	(self.Icon or _G[self:GetName() .. "Icon"]):SetTexture("Interface\\ICONS\\" .. icon);
+	local iconFrame = self.Icon or _G[self:GetName() .. "Icon"]
+	iconFrame:SetTexture(resolveIcon(icon));
 end
 
 --*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
