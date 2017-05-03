@@ -339,6 +339,43 @@ local function initIconBrowser()
 	TRP3_IconBrowserTitle:SetText(loc("UI_ICON_BROWSER"));
 	TRP3_IconBrowserFilterBoxText:SetText(loc("UI_FILTER"));
 	filteredIconBrowser();
+
+
+	-- Icon from item
+	hooksecurefunc("HandleModifiedItemClick", function(link)
+		if TRP3_IconBrowser:IsVisible() and IsControlKeyDown() and link and GetItemIcon(link) then
+			local textureID = GetItemIcon(link);
+			TRP3_API.popup.hideIconBrowser();
+			if ui_IconBrowserContent.onSelectCallback then
+				ui_IconBrowserContent.onSelectCallback(textureID, textureID);
+			end
+		end
+	end);
+	-- Icon from spellbook
+	local GetSpellBookItemTexture, SpellBook_GetSpellBookSlot, SpellBookFrame = GetSpellBookItemTexture, SpellBook_GetSpellBookSlot, SpellBookFrame;
+	hooksecurefunc("SpellButton_OnModifiedClick", function(self)
+		if TRP3_IconBrowser:IsVisible() and IsControlKeyDown() then
+			local textureID = GetSpellBookItemTexture(SpellBook_GetSpellBookSlot(self), SpellBookFrame.bookType);
+			TRP3_API.popup.hideIconBrowser();
+			if ui_IconBrowserContent.onSelectCallback then
+				ui_IconBrowserContent.onSelectCallback(textureID, textureID);
+			end
+		end
+	end);
+
+	Utils.event.registerHandler("ADDON_LOADED", function(...)
+		print("pouic");
+		print(...);
+	end)
+	--hooksecurefunc("MountListItem_OnClick", function(self)
+	--	if TRP3_IconBrowser:IsVisible() and IsControlKeyDown() then
+	--		local textureID = self.icon:GetTexture();
+	--		TRP3_API.popup.hideIconBrowser();
+	--		if ui_IconBrowserContent.onSelectCallback then
+	--			ui_IconBrowserContent.onSelectCallback(textureID, textureID);
+	--		end
+	--	end
+	--end)
 end
 
 local function showIconBrowser(onSelectCallback, onCancelCallback, scale)
