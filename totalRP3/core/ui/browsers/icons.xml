@@ -118,6 +118,27 @@
 							<Anchor point="BOTTOM" x="0" y="10"/>
 						</Anchors>
 					</EditBox>
+					<Button name="TRP3_IconBrowserFilterHelp" inherits="TRP3_HelpButton">
+						<Anchors>
+							<Anchor point="TOPRIGHT" x="-10" y="-10"/>
+						</Anchors>
+						<Layers>
+							<Layer level="OVERLAY">
+								<Texture file="Interface\Calendar\EventNotificationGlow" name="$parentBlink" alpha="0.0" alphaMode="ADD">
+									<Animations>
+										<AnimationGroup parentKey="blinkingAnimation" looping="REPEAT">
+											<Alpha duration="0.4" fromAlpha="0.0" toAlpha="0.3" smoothing="IN" order="1"/>
+											<Alpha duration="0.4" fromAlpha="0.3" toAlpha="0.0" smoothing="OUT" startDelay="0.4" order="1"/>
+										</AnimationGroup>
+									</Animations>
+									<Size x="25" y="25"/>
+									<Anchors>
+										<Anchor x="0" y="0" point="CENTER"/>
+									</Anchors>
+								</Texture>
+							</Layer>
+						</Layers>
+					</Button>
 				</Frames>
 			</Frame>
 		</Frames>

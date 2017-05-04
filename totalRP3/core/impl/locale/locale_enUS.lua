@@ -728,8 +728,8 @@ Use the |cffffff00Import profile|r option to paste data from a previous export i
 		UI_ICON_BROWSER_HELP_TT = [[While this frame is open you can |cffffff00ctrl + click|r on a icon to copy its name.
 
 This will works:|cff00ff00
-- On any item in your bags
-- On any icon in the spellbook|r]],
+- On any item in your bags or inventory
+- On any icon in your spellbook|r]],
 		UI_COMPANION_BROWSER_HELP = "Select a battle pet",
 		UI_COMPANION_BROWSER_HELP_TT = "|cffffff00Warning: |rOnly renamed battle pets can be bound to a profile.\n\n|cff00ff00This section lists these battle pets only.",
 		UI_ICON_SELECT = "Select icon",

@@ -30,6 +30,8 @@ local setTooltipForFrame, setTooltipForSameFrame = TRP3_API.ui.tooltip.setToolti
 local hooksecurefunc, GetItemIcon, IsControlKeyDown = hooksecurefunc, GetItemIcon, IsControlKeyDown;
 local getIconList, getIconListSize, getImageList, getImageListSize, getMusicList, getMusicListSize;
 local hexaToNumber, numberToHexa = TRP3_API.utils.color.hexaToNumber, TRP3_API.utils.color.numberToHexa;
+local playAnimation = TRP3_API.ui.misc.playAnimation;
+local refreshTooltipForFrame = TRP3_RefreshTooltipForFrame;
 local strconcat = strconcat;
 local safeMatch = TRP3_API.utils.str.safeMatch;
 
@@ -335,6 +337,25 @@ local function initIconBrowser()
 
 	TRP3_IconBrowserFilterBox:SetScript("OnTextChanged", filteredIconBrowser);
 	TRP3_IconBrowserClose:SetScript("OnClick", onIconClose);
+
+	local iconPickerHelperButton = TRP3_IconBrowserFilterHelp;
+	local iconPickerHelperButtonBlinkingAnimation = iconPickerHelperButton.blinkingAnimation;
+
+	local iconPickerHelperButtonBlinkingAnimationHasBeenShown = false;
+
+	iconPickerHelperButton:SetScript("OnEnter", function()
+		iconPickerHelperButtonBlinkingAnimationHasBeenShown = true;
+		iconPickerHelperButtonBlinkingAnimation:Stop();
+		refreshTooltipForFrame(iconPickerHelperButton);
+	end)
+
+	iconPickerHelperButton:SetScript("OnShow", function()
+		if not iconPickerHelperButtonBlinkingAnimationHasBeenShown then
+			playAnimation(iconPickerHelperButtonBlinkingAnimation);
+		end
+	end)
+
+	setTooltipForSameFrame(iconPickerHelperButton, "BOTTOMLEFT", 0, 0, "|TInterface\\TUTORIALFRAME\\UI-TutorialFrame-GloveCursor:40|t " .. loc("UI_ICON_BROWSER_HELP"), loc("UI_ICON_BROWSER_HELP_TT"));
 
 	TRP3_IconBrowserTitle:SetText(loc("UI_ICON_BROWSER"));
 	TRP3_IconBrowserFilterBoxText:SetText(loc("UI_FILTER"));
