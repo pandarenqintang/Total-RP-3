@@ -20,9 +20,10 @@
 
 -- Public access
 ---@class Automator
-local Automator = {};
+local Automator = {
+	enabled = false
+};
 TRP3_API.automator = Automator;
-
 local log = TRP3_API.utils.log.log;
 
 local function logFormat(text, ...)
@@ -30,7 +31,23 @@ local function logFormat(text, ...)
 end
 
 local assert = assert;
+local format = string.format;
 local unpack, strjoin, pairs = unpack, strjoin, pairs;
+
+local tcopy = TRP3_API.utils.table.copy;
+local treverse = TRP3_API.utils.table.reverse;
+local getProfile = TRP3_API.profile.getData;
+local setTooltipForFrame = TRP3_API.ui.tooltip.setTooltipForFrame;
+local loc = TRP3_API.locale.getText;
+
+function Automator.getPlayerProfileWithActiveVariations()
+	local profile = tcopy(getProfile("player"));
+	if Automator.enabled then
+		Automator.applyActiveVariationsToProfile(profile);
+	end
+	return profile;
+end
+
 
 local automatorTriggers = {};
 
@@ -80,17 +97,21 @@ end
 
 local function onStart()
 
+	Automator.enabled = true;
+
+	local activeVariations = {};
+
 	local registerHandler = TRP3_API.utils.event.registerHandler;
 
 	local druidVariations = {
 		{
-			variationName                 = "Kitty",
-			triggerID                     = "shapeshifting",
+			variationName = "Kitty",
+			triggerID = "shapeshifting",
 			triggerTestFunctionParameters = { "CAT" },
-			modifications                 = {
+			modifications = {
 				{
-					modificationID                = "characteristics",
-					modifcationFunctionParameters = { {
+					modificationID = "characteristics",
+					modificationFunctionParameters = { {
 						CH = "5A97BB",
 						IC = "TalentSpec_Druid_Feral_Cat";
 						TI = "Kitty cat"
@@ -99,13 +120,13 @@ local function onStart()
 			}
 		},
 		{
-			variationName                 = "Bear",
-			triggerID                     = "shapeshifting",
+			variationName = "Bear",
+			triggerID = "shapeshifting",
 			triggerTestFunctionParameters = { "BEAR" },
-			modifications                 = {
+			modifications = {
 				{
-					modificationID                = "characteristics",
-					modifcationFunctionParameters = { {
+					modificationID = "characteristics",
+					modificationFunctionParameters = { {
 						CH = "AE592D",
 						IC = "TalentSpec_Druid_Feral_Bear",
 						TI = "Tanky"
@@ -114,52 +135,52 @@ local function onStart()
 			}
 		},
 		{
-			variationName                 = "Healing spec",
-			triggerID                     = "specialization",
+			variationName = "Healing spec",
+			triggerID = "specialization",
 			triggerTestFunctionParameters = { 4 },
-			modifications                 = {
+			modifications = {
 				{
-					modificationID                = "characteristics",
-					modifcationFunctionParameters = { {
+					modificationID = "characteristics",
+					modificationFunctionParameters = { {
 						FT = "Healer"
 					} }
 				}
 			}
 		},
 		{
-			variationName                 = "Tank spec",
-			triggerID                     = "specialization",
+			variationName = "Tank spec",
+			triggerID = "specialization",
 			triggerTestFunctionParameters = { 3 },
-			modifications                 = {
+			modifications = {
 				{
-					modificationID                = "characteristics",
-					modifcationFunctionParameters = { {
+					modificationID = "characteristics",
+					modificationFunctionParameters = { {
 						FT = "Guardian"
 					} }
 				}
 			}
 		},
 		{
-			variationName                 = "Tanking set",
-			triggerID                     = "equipment_set",
+			variationName = "Tanking set",
+			triggerID = "equipment_set",
 			triggerTestFunctionParameters = { 2 },
-			modifications                 = {
+			modifications = {
 				{
-					modificationID                = "characteristics",
-					modifcationFunctionParameters = { {
+					modificationID = "characteristics",
+					modificationFunctionParameters = { {
 						FT = "Avec tabard"
 					} }
 				}
 			}
 		},
 		{
-			variationName                 = "Tanking set",
-			triggerID                     = "equipment_set",
+			variationName = "Tanking set",
+			triggerID = "equipment_set",
 			triggerTestFunctionParameters = { 4 },
-			modifications                 = {
+			modifications = {
 				{
-					modificationID                = "characteristics",
-					modifcationFunctionParameters = { {
+					modificationID = "characteristics",
+					modificationFunctionParameters = { {
 						FT = "Sans tabard"
 					} }
 				}
@@ -168,14 +189,14 @@ local function onStart()
 	}
 
 	local variations = {
-		{
-			variationName                 = "In worgen form",
-			triggerID                     = "worgen_form",
+		[1] = {
+			variationName = "In worgen form",
+			triggerID = "worgen_form",
 			triggerTestFunctionParameters = { true },
-			modifications                 = {
+			modifications = {
 				{
-					modificationID                = "characteristics",
-					modifcationFunctionParameters = { {
+					modificationID = "characteristics",
+					modificationFunctionParameters = { {
 						IC = "Ability_Racial_Viciousness",
 						CH = "87939A",
 						RA = "Worgen"
@@ -183,14 +204,14 @@ local function onStart()
 				}
 			}
 		},
-		{
-			variationName                 = "In human form",
-			triggerID                     = "worgen_form",
+		[2] = {
+			variationName = "In human form",
+			triggerID = "worgen_form",
 			triggerTestFunctionParameters = { false },
-			modifications                 = {
+			modifications = {
 				{
-					modificationID                = "characteristics",
-					modifcationFunctionParameters = { {
+					modificationID = "characteristics",
+					modificationFunctionParameters = { {
 						IC = "Achievement_Character_Human_Female",
 						CH = "30A3E1",
 						RA = "Human"
@@ -223,23 +244,8 @@ local function onStart()
 
 					-- Check if the trigger condition is validated
 					-- We pass the function parameters defined in the variation and also the event parameters
-					if trigger.testFunction(variation.triggerTestFunctionParameters, {...}) then
-
-						logFormat("Trigger %s was true.", variation.triggerID);
-
-						for _, modification in pairs(variation.modifications) do
-							logFormat("Applying modification %s", modification.modificationID);
-							assert(automatorModifications[modification.modificationID],
-								   "Unkown modification executed in variation " .. variation.variationName .. ": " .. modification.modificationID);
-
-							automatorModifications[modification.modificationID].modificationFunction(unpack(modification.modifcationFunctionParameters));
-						end
-
-					else
-
-						logFormat("Trigger %s was false.", variation.triggerID);
-
-					end
+					variations.isActive = trigger.testFunction(variation.triggerTestFunctionParameters, { ... })
+					logFormat("Trigger %s was %s.", variation.triggerID, variations.isActive);
 				end )
 
 				logFormat("Registered event %s", event)
@@ -247,54 +253,99 @@ local function onStart()
 		end
 	end
 
+
+
+	--- Apply the currently active variations to the give profile
+	---    @param profile table
+	--- @return table
+	function Automator.applyActiveVariationsToProfile(profile)
+
+		for _, variation in pairs(variations) do
+			if variation.isActive then
+				for _, modification in pairs(variation.modifications) do
+					logFormat("Applying modification %s", modification.modificationID);
+					assert(automatorModifications[modification.modificationID],
+					"Unkown modification executed in variation " .. variation.variationName .. ": " .. modification.modificationID);
+					automatorModifications[modification.modificationID].modificationFunction(profile, unpack(modification.modificationFunctionParameters));
+				end
+			end
+		end
+
+		return profile
+	end
+
+
 	---@type ColorMixin
 	local variableColor = TRP3_API.utils.color.CreateColor(1, 0.82, 0);
 	local function onVariationsPageShow()
+
+		-- Variations are applied from the start of the table to then end of the table,
+		-- but should be presented as the latest applied being on top in the UI.
+		-- So we create a copy of the table and reverse its order.
+		local variations = treverse(tcopy(variations));
+
 		for i, variation in pairs(variations) do
 			if i > 5 then
 				break
 			end
 			local line = _G["TRP3_AutomatorListListLine" .. i];
 
+			local tooltipText = "";
+
 			line.Title:SetText(variation.variationName);
 
-			local triggerAction = automatorTriggers[variation.triggerID];
+			local trigger = automatorTriggers[variation.triggerID];
 
-			if triggerAction.listDecorator then
-				line.SubTitle:SetText(triggerAction.listDecorator(unpack(variation.triggerTestFunctionParameters)));
+			if trigger.listDecorator then
+				line.SubTitle:SetText(trigger.listDecorator(unpack(variation.triggerTestFunctionParameters)));
 			else
-				line.SubTitle:SetText("When " .. variableColor:WrapTextInColorCode(triggerAction.name) .. " is " .. variableColor:WrapTextInColorCode(strjoin(", ", unpack(variation.triggerTestFunctionParameters))));
+				line.SubTitle:SetText(format(
+				loc("ATM_DEFAULT_TRIGGER_DECORATOR"),
+				variableColor:WrapTextInColorCode(trigger.name),
+				variableColor:WrapTextInColorCode(strjoin(", ", unpack(variation.triggerTestFunctionParameters)))
+				));
 			end
 
-			if triggerAction.icon then
-				line.Icon:SetTexture("Interface\\ICONS\\" .. triggerAction.icon)
+			tooltipText = tooltipText .. "\n".. line.SubTitle:GetText();
+
+			if trigger.icon then
+				line.Icon:SetTexture("Interface\\ICONS\\" .. trigger.icon)
 			end
 
-			if triggerAction.isAvailable and not triggerAction.isAvailable() then
+			-- Check if this trigger trigger is available for the current character
+			-- Since profiles can be shared across multiple characters of different specs, classes, etc.
+			-- If there is no isAvailable() function for the trigger, we assume it is always available
+			if trigger.isAvailable and not trigger.isAvailable() then
 				--TODO Tooltip about how the trigger is not available for this character
 				line.Icon:SetVertexColor(1, 0, 0);
+				tooltipText = tooltipText .. "\n" .. loc("ATM_TRIGGER_UNAVAILABLE");
 			else
 				line.Icon:SetVertexColor(1, 1, 1);
 			end
+
+			setTooltipForFrame(line, line, "RIGHT", 0, -30, -- Tooltip position
+			variation.variationName, -- Tooltip title
+			tooltipText -- Tooltip content
+			)
 		end
 	end
 
 	TRP3_API.navigation.menu.registerMenu(
 	{
-		id         = "main_19_player_automator",
-		text       = "Variations",
+		id = "main_19_player_automator",
+		text = loc("ATM_MENU"),
 		onSelected = function()
 			TRP3_API.navigation.page.setPage("player_automator");
 		end,
-		isChildOf  = "main_10_player",
+		isChildOf = "main_10_player",
 	}
 	);
 
 	TRP3_API.navigation.page.registerPage(
 	{
-		id               = "player_automator",
-		frame            = TRP3_AutomatorList,
-		onPagePostShow   = onVariationsPageShow,
+		id = "player_automator",
+		frame = TRP3_AutomatorList,
+		onPagePostShow = onVariationsPageShow,
 		tutorialProvider = function()
 			return {};
 		end,
@@ -306,11 +357,11 @@ end
 -- Register a Total RP 3 trigger that can be disabled in the settings
 TRP3_API.module.registerModule(
 {
-	["name"]        = "Automator",
-	["description"] = "Bring automation to Total RP 3.",
-	["version"]     = 0.1,
-	["id"]          = "trp3_automator",
-	["onStart"]     = onStart,
-	["minVersion"]  = 27
+	["name"] = loc("ATM_MODULE_NAME"),
+	["description"] = loc("ATM_MODULE_DESCRIPTION"),
+	["version"] = 0.1,
+	["id"] = "trp3_automator",
+	["onStart"] = onStart,
+	["minVersion"] = 27
 }
 );

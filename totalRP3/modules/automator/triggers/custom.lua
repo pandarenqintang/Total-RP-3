@@ -20,6 +20,10 @@
 ---@type Automator
 local Automator = TRP3_API.automator;
 
+local loc = TRP3_API.locale.getText;
+
+local format = string.format;
+
 local testFunctionParameters = {
 	customTestFunctionDescription = "My custom test",
 	customTestFunction = function(eventParameters) end,
@@ -33,7 +37,7 @@ end
 local variableColor = TRP3_API.utils.color.CreateColor(1, 0.82, 0);
 
 local function listDecorator(testFunctionParameters)
-	return ("When your custom trigger %s into %s"):format(
+	return format(loc("ATM_CUSTOM_DECORATOR"),
 	variableColor:WrapTextInColorCode(testFunctionParameters.customTestFunctionDescription),
 	variableColor:WrapTextInColorCode("true")
 	);
@@ -45,8 +49,8 @@ end
 
 Automator.registerTrigger(
 {
-	["name"]          = "Custom trigger",
-	["description"]   = "Adapt your profile according to custom a custom trigger.",
+	["name"]          = loc("ATM_CUSTOM_NAME"),
+	["description"]   = loc("ATM_CUSTOM_DESCRIPTION"),
 	["id"]            = "custom_trigger",
 	["icon"]          = "INV_Eng_GearspringParts",
 

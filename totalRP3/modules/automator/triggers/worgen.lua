@@ -20,6 +20,9 @@
 ---@type Automator
 local Automator = TRP3_API.automator;
 
+local format = string.format;
+local loc = TRP3_API.locale.getText;
+
 -- WoW API imports
 local UnitRace, UnitClassBase = UnitRace, UnitClassBase;
 local select = select;
@@ -36,10 +39,11 @@ end
 local variableColor = TRP3_API.utils.color.CreateColor(1, 0.82, 0);
 
 local function listDecorator(testFunctionParameters)
-	local desiredForm = testFunctionParameters.shouldBeInWorgenForm and "a worgen" or "a human";
+	local desiredForm = testFunctionParameters.shouldBeInWorgenForm and loc("ATM_WORG_WORG") or loc("ATM_WORG_HUMAN");
 
-	return ("When you %s into %s"):format(
-	variableColor:WrapTextInColorCode("you transform"),
+	return format(
+	loc("ATM_WORG_DECORATOR"),
+	variableColor:WrapTextInColorCode(loc("ATM_WORG_DECORATOR_VERB")),
 	variableColor:WrapTextInColorCode(desiredForm)
 	);
 end
@@ -50,8 +54,8 @@ end
 
 Automator.registerTrigger(
 {
-	["name"]          = "Worgen form",
-	["description"]   = "Adapt your profile when going into your human or your worgen form",
+	["description"]   = loc("ATM_WORG_NAME"),
+	["name"]          = loc("ATM_WORG_DESCRIPTION"),
 	["id"]            = "worgen_form",
 	["icon"]          = "achievement_worganhead",
 	["events"]        = { "UNIT_PORTRAIT_UPDATE" },

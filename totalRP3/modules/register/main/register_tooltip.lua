@@ -51,6 +51,7 @@ local unitIDToInfo = Utils.str.unitIDToInfo;
 local lightenColorUntilItIsReadable = Utils.color.lightenColorUntilItIsReadable;
 local isPlayerIC;
 local unitIDIsFilteredForMatureContent;
+local Automator = TRP3_API.automator;
 
 -- ICONS
 local AFK_ICON = "|TInterface\\FriendsFrame\\StatusIcon-Away:15:15|t";
@@ -315,7 +316,7 @@ TRP3_API.register.getUnitID = getUnitID;
 -- The returned table is not nil, but could be empty.
 local function getCharacterInfoTab(unitID)
 	if unitID == Globals.player_id then
-		return get("player");
+		return Automator.getPlayerProfileWithActiveVariations();
 	elseif IsUnitIDKnown(unitID) then
 		return getUnitIDCurrentProfile(unitID) or {};
 	end

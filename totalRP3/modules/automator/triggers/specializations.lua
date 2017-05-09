@@ -19,6 +19,7 @@
 
 ------@type Automator
 local Automator = TRP3_API.automator;
+local loc = TRP3_API.locale.getText;
 
 -- WoW API imports
 local GetSpecialization = GetSpecialization;
@@ -67,16 +68,16 @@ local function listDecorator(testFunctionParameters)
 
 	if not name then name = UNKNOWN end
 
-	return ("When you %s to your %s specialization."):format(
-	variableColor:WrapTextInColorCode("switching specialization"),
+	return (loc("ATM_SPEC_DECORATOR")):format(
+	variableColor:WrapTextInColorCode(loc("ATM_SPEC_DECORATOR_VERB")),
 	variableColor:WrapTextInColorCode(name)
 	);
 end
 
 Automator.registerTrigger(
 {
-	["name"]          = "Specializations",
-	["description"]   = "Adapt your profile when you switch specializations.",
+	["name"]          = loc("ATM_SPEC_NAME"),
+	["description"]   = loc("ATM_SPEC_DESCRIPTION"),
 	["id"]            = "specialization",
 	["events"]        = { "ACTIVE_TALENT_GROUP_CHANGED" },
 	["icon"]          = "Inv_7XP_Inscription_TalentTome02",

@@ -21,12 +21,10 @@
 local Automator = TRP3_API.automator;
 local Events = TRP3_API.events;
 local playerID = TRP3_API.globals.player_id;
-local getData = TRP3_API.profile.getData;
 
 local pairs = pairs;
 
-local function modificationFunction(characteristics)
-	local profile = getData("player");
+local function modificationFunction(profile, characteristics)
 
 	for field, value in pairs(characteristics) do
 		profile.characteristics[field] = value;

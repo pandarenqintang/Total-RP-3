@@ -194,6 +194,7 @@
 	</Frame>
 
 
+	<Script file="locale_TEMP.lua"/>
 	<Script file="automator.lua"/>
 
 	<!--<Script file="triggers/auras.lua"/>-->

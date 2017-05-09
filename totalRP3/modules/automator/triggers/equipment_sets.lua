@@ -20,6 +20,7 @@
 ---@type Automator
 local Automator = TRP3_API.automator;
 
+local loc = TRP3_API.locale.getText;
 
 local pairs, tinsert = pairs, tinsert;
 
@@ -64,13 +65,13 @@ local variableColor = TRP3_API.utils.color.CreateColor(1, 0.82, 0);
 local function listDecorator(testFunctionParameters)
 	local name, iconFileID, setID, isEquipped = GetEquipmentSetInfo(testFunctionParameters.targetedEquipmentSetID);
 
-	local conditionText = testFunctionParameters.targetEquipmentSetShouldBeEquipped and "equip" or "unequip";
+	local conditionText = testFunctionParameters.targetEquipmentSetShouldBeEquipped and loc("ATM_SETS_EQUIP") or loc("ATM_SETS_UNEQUIP");
 
 	if not name then
-		name = "Unknown equipment set"
+		name = loc("ATM_SETS_UNKNOWN");
 	end
 
-	return ("When you %s equipment set %s."):format(
+	return (loc("ATM_SETS_DECORATOR")):format(
 	variableColor:WrapTextInColorCode(conditionText),
 	variableColor:WrapTextInColorCode(name)
 	);
@@ -78,8 +79,8 @@ end
 
 Automator.registerTrigger(
 {
-	["name"]          = "Equipment sets",
-	["description"]   = "Adapt your profile when switching equipment sets",
+	["name"]          = loc("ATM_SETS_NAME"),
+	["description"]   = loc("ATM_SETS_DESCRIPTION"),
 	["id"]            = "equipment_set",
 	["events"]        = { "EQUIPMENT_SWAP_FINISHED" },
 	["testFunction"]  = testFunction,

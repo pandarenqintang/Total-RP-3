@@ -205,6 +205,14 @@ Utils.table.remove = function(table, object)
 	return false;
 end
 
+function Utils.table.reverse(table)
+	for i=1, math.floor(#table / 2) do
+		local tmp = table[i]
+		table[i] = table[#table - i + 1]
+		table[#table - i + 1] = tmp
+	end
+end
+
 function Utils.table.keys(table)
 	local keys = {};
 	for key, _ in pairs(table) do

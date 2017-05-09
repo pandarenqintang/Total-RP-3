@@ -20,9 +20,12 @@
 ---@type Automator
 local Automator = TRP3_API.automator;
 
+local loc = TRP3_API.locale.getText;
+
 -- WoW API imports
 local UnitRace, UnitClassBase = UnitRace, UnitClassBase;
 local select = select;
+local format = string.format;
 local GetShapeshiftFormID, GetShapeshiftFormInfo, GetShapeshiftForm = GetShapeshiftFormID, GetShapeshiftFormInfo, GetShapeshiftForm;
 
 local SHAPESHIFT_FORMS      = {
@@ -46,14 +49,14 @@ local SHAPESHIFT_FORMS      = {
 }
 
 local SHAPESHIFT_FORM_NAMES = {
-	CAT      = "Cat Form",
-	TRAVEL   = "Travel Form",
-	AQUATIC  = "Aquatic Form",
-	BEAR     = "Bear Form",
-	FLIGHT   = "Flight Form",
-	MOONKIN  = "Moonkin Form",
-	AFFINITY = "Affinity Form",
-	TREANT   = "Treant Form",
+	CAT      = loc("ATM_SHAPE_FORM_CAT"),
+	TRAVEL   = loc("ATM_SHAPE_FORM_TRAVEL"),
+	AQUATIC  = loc("ATM_SHAPE_FORM_AQUATIC"),
+	BEAR     = loc("ATM_SHAPE_FORM_BEAR"),
+	FLIGHT   = loc("ATM_SHAPE_FORM_FLIGHT"),
+	MOONKIN  = loc("ATM_SHAPE_FORM_MOONKIN"),
+	AFFINITY = loc("ATM_SHAPE_FORM_AFFINITY"),
+	TREANT   = loc("ATM_SHAPE_FORM_TREANT")
 }
 
 local PLAYER_CLASS          = select(2, UnitClassBase("player"));
@@ -80,10 +83,10 @@ end
 local variableColor = TRP3_API.utils.color.CreateColor(1, 0.82, 0);
 
 local function listDecorator(testFunctionParameters)
-	local formName = SHAPESHIFT_FORM_NAMES[testFunctionParameters.desiredForm] or "Unknown shapeshift form";
+	local formName = SHAPESHIFT_FORM_NAMES[testFunctionParameters.desiredForm] or loc("ATM_SHAPE_UNKNOWN");
 
-	return ("When %s into %s."):format(
-	variableColor:WrapTextInColorCode("shapeshifting"),
+	return format(loc("ATM_SHAPE_DECORATOR"),
+	variableColor:WrapTextInColorCode(loc("ATM_SHAPE_DECORATOR_VERB")),
 	variableColor:WrapTextInColorCode(formName)
 	);
 end
@@ -94,8 +97,8 @@ end
 
 Automator.registerTrigger(
 {
-	["name"]          = "Shapeshifting",
-	["description"]   = "Adapt your profile when shapeshifting",
+	["name"]          = loc("ATM_SHAPE_NAME"),
+	["description"]   = loc("ATM_SHAPE_DESCRIPTION"),
 	["id"]            = "shapeshifting",
 	["events"]        = { "UPDATE_SHAPESHIFT_FORM" },
 	["icon"]          = "Ability_Druid_MasterShapeshifter",
