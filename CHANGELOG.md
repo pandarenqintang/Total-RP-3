@@ -1,16 +1,39 @@
-## Improvements
+# Changelog
 
-- Since we kept seeing invalid bug reports from users who are inserting non-supported codes inside their profiles, Total RP 3 will now clean the user profile from these invalid codes on launch and try to prevent advanced editing on runtime. From now on, any bug report involving profiles that have non supported codes injected in them will be systematically ignored.
-- Added custom module for the [TinyTooltip](https://mods.curse.com/addons/wow/268266-tinytooltip) add-on to apply its tooltip modifications to Total RP 3's tooltips.
-- Added character limitation on the NPC speeches window and a character count to indicate how many characters are remaining for your message — [Issue #101](https://wow.curseforge.com/projects/total-rp-3/issues/101)
-- Added a button to reset the mature filter dictionary to its default values — [Issue #97](https://wow.curseforge.com/projects/total-rp-3/issues/97)
+## [Unreleased]
 
-## Bug fixes
+### Added
 
-- Fixed alignment of the text field labels for personality traits.
-- Fixed an issue where the text popup for copying the URL of a link clicked in a profile had truncated text if another add-on added a limit on the text input before Total RP 3 opened the pop-up — [Issue #113](https://wow.curseforge.com/projects/total-rp-3/issues/113)
-- Fixed an issue with the custom WIM integration — [Issue #108](https://wow.curseforge.com/projects/total-rp-3/issues/108)
-- The option to crop unreasonably long text in the tooltips is now also effective on companion tooltips. — [Issue #104](https://wow.curseforge.com/projects/total-rp-3/issues/104)
-- Links are no longer removed from your description when it is sent to other RP add-ons via the Mary Sue Protocol.
-- Updated the libraries used by the add-on to their latest versions, including the dropdown library, in order to fix some issues with some dropdowns.
+- New nameplate customizations: Total RP 3 will now customize the nameplates of friendly players by default! Here's what you get:
+	- The nameplates will now display the RP name of players instead of their character names
+	- The names are colored using the custom colors defined in the profile or the class color as a fallback.
+	- The health bars are removed from the nameplate so you only see names.
+	- The custom player icon is visible next to the name of the player.
+	- The custom title is visible bellow the name of the player.
+	- The at-first-glance slots are visible above the name of the player.
+	- You can enable the option to hide the names of players without an RP profile. You will only see the names of people with an RP profile, making it ridiculously easy to spot them in a crowd.
+	- All the customizations mentioned above are automatically disabled when you set your roleplay status to Out Of Character
+	- All the points listed above have settings for you to toggle individual features on or off in the new Nameplates settings.
 
+_Note: This is for the default nameplates only. It may work with other nameplates add-on, but it is not designed to. The [Total RP 3: KuiNameplates module](https://mods.curse.com/addons/wow/total-rp-3-kuinameplates-module) provides the same features specifically for the KuiNameplates add-on. Compatibility with more nameplates add-ons may come in the future._
+
+## [1.2.9.1] - 2017-08-29
+
+### Added
+
+- Added Traditional Chinese and Korean localizations.
+
+### Changed
+
+- Renamed Chinese localization to Simplified Chinese.
+- Fixed many typos in the English localization (thanks to Solanya).
+
+### Removed
+- Removed the option to change the detection pattern for NPC speeches, as it created many issues and there really wasn't a need for it.
+
+### Fixed
+
+- Fixed issues with patch 7.3.
+
+[Unreleased]: https://github.com/olivierlacan/keep-a-changelog/compare/1.2.9.1...HEAD
+[1.2.9.1]: https://github.com/Ellypse/Total-RP-3/compare/1.2.9...1.2.9.1
