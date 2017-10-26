@@ -46,7 +46,7 @@ local UnitFullName = UnitFullName;
 local UNKNOWNOBJECT = UNKNOWNOBJECT;
 local SetPortraitToTexture = SetPortraitToTexture;
 local getZoneText, getSubZoneText = GetZoneText, GetSubZoneText;
-local PlaySoundKitID, select, StopSound = PlaySoundKitID, select, StopSound;
+local PlaySound, select, StopSound = PlaySound, select, StopSound;
 
 function Utils.pcall(func, ...)
 	if func then
@@ -425,7 +425,7 @@ function Utils.str.sanitize(text)
 end
 
 function Utils.str.crop(text, size)
-	text = strtrim(text);
+	text = strtrim(text or "");
 	if text:len() > size then
 		text = text:sub(1, size) .. "…";
 	end
@@ -1018,7 +1018,7 @@ end
 
 function Utils.music.playSoundID(soundID, channel, source)
 	assert(soundID, "soundID can't be nil.")
-	local willPlay, handlerID = PlaySoundKitID(soundID, channel, false);
+	local willPlay, handlerID = PlaySound(soundID, channel, false);
 	if willPlay then
 		tinsert(soundHandlers, {channel = channel, id = soundID, handlerID = handlerID, source = source, date = date("%H:%M:%S")});
 		if TRP3_SoundsHistoryFrame then
@@ -1075,8 +1075,10 @@ Utils.texture.applyRoundTexture = function(textureFrame, texturePath, failTextur
 		Log.log("Fail to round texture: " .. tostring(errorMess));
 		if failTexture then
 			SetPortraitToTexture(textureFrame, failTexture);
-		elseif _G[textureFrame] then
+		elseif type(textureFrame) == string and _G[textureFrame] then
 			_G[textureFrame]:SetTexture(texturePath);
+		elseif textureFrame.SetTexture then
+			textureFrame:SetTexture(texturePath);
 		end
 	end
 end
