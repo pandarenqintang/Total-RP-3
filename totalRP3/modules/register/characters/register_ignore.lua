@@ -37,6 +37,8 @@ local profiles, characters, blackList, whiteList;
 
 TRP3_API.register.relation = {};
 
+TRP3_API.register.relation = {};
+
 local RELATIONS = {
 	UNFRIENDLY = {
 		id = "UNFRIENDLY",
