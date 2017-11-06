@@ -60,5 +60,9 @@
 			</Frame>
 		</Frames>
 	</Frame>
-    
+
+
+
+	<Frame name="TRP3_RelationManager" inherits="TRP3_ProfileManagerTemplate" hidden="true" />
+
 </Ui>

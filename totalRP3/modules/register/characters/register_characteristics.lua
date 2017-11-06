@@ -801,7 +801,9 @@ local function onActionClicked(button)
 	if context.profile.link and tsize(context.profile.link) > 0 then
 		tinsert(values, { loc("REG_PLAYER_IGNORE"):format(tsize(context.profile.link)), 2 });
 	end
-	local relationRows = {}
+	local relationRows = {};
+
+	tinsert(relationRows, {loc("REG_RELATION_NONE"), "NONE"});
 	for id, relation in pairs(RELATIONS.relations) do
 		tinsert(relationRows, {relation.humanReadable or loc("REG_RELATION_" .. id), id});
 	end

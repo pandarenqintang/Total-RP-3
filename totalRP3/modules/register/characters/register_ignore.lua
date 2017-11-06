@@ -33,58 +33,62 @@ local profiles, characters, blackList, whiteList;
 --*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 -- Relation
 --*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+-- Note: This is here rather than in misc due to load order issues.
 
 TRP3_API.register.relation = {};
 
 local RELATIONS = {
 	UNFRIENDLY = {
-		name = "UNFRIENDLY",
+		id = "UNFRIENDLY",
 		texture = "Ability_DualWield",
 		color = {1, 0, 0; },
 		humanReadable = false,
 		tooltip = false --set to false to use localization (temporary fix)
 	},
-	NONE = {
-		name = "NONE",
-		texture = "Ability_rogue_disguise",
-		color = {1, 1, 1}
-	},
 	NEUTRAL = {
-		name = "NEUTRAL",
+		id = "NEUTRAL",
 		texture = "Achievement_Reputation_05",
 		color = {0.5, 0.5, 1}
 	},
 	BUSINESS = {
-		name = "BUSINESS",
+		id = "BUSINESS",
 		texture = "Achievement_Reputation_08",
 		color = {1, 1, 0}
 	},
 	FRIEND = {
-		name = "FRIEND",
+		id = "FRIEND",
 		texture = "Achievement_Reputation_06",
 		color = {0, 1, 0}
 	},
 	LOVE = {
-		name = "LOVE",
+		id = "LOVE",
 		texture = "INV_ValentinesCandy",
 		color = {1, 0.5, 1}
 	},
 	FAMILY = {
-		name = "FAMILY",
+		id = "FAMILY",
 		texture = "Achievement_Reputation_07",
 		color = {1, 0.75, 0}
 	}
 }
 TRP3_API.register.relation.relations = RELATIONS;
 
+TRP3_API.register.relation.NONE = {
+	id = "NONE",
+	texture = "Ability_rogue_disguise",
+	color = {1, 1, 1}
+}
 
 local function setRelation(profileID, relation)
 	local profile = getPlayerCurrentProfile();
 	if not profile.relation then
 		profile.relation = {};
 	end
-	if relation.name then
-		relation = relation.name;
+	if relation.id then
+		relation = relation.id;
+	end
+	if relation.id == "NONE" then
+		relation = nil;
 	end
 	profile.relation[profileID] = relation;
 end
@@ -93,7 +97,12 @@ TRP3_API.register.relation.setRelation = setRelation;
 local function getRelation(profileID)
 	local relationTab = get("relation") or EMPTY;
 	local relation = relationTab[profileID] or "NONE";
-	return RELATIONS[relation]
+	if relation == "NONE" then
+		return TRP3_API.register.relation.NONE
+	else
+
+		return RELATIONS[relation];
+	end
 end
 TRP3_API.register.relation.getRelation = getRelation;
 
@@ -102,7 +111,10 @@ local function getRelationText(profileID)
 	if relation == RELATIONS.NONE then
 		return "";
 	end
-	return loc("REG_RELATION_" .. relation.name);
+	if relation.humanReadable then
+		return relation.humanReadable
+	end
+	return loc("REG_RELATION_" .. relation.id);
 end
 TRP3_API.register.relation.getRelationText = getRelationText;
 
@@ -111,7 +123,7 @@ local function getRelationTooltipText(profileID, profile)
 	if relation.tooltip then
 		return relation.tooltip:gsub("%{player%}", getPlayerCompleteName(true)):gsub("%{target%}", getCompleteName(profile.characteristics or EMPTY, UNKNOWN, true))
 	else
-		return loc("REG_RELATION_" .. getRelation(profileID).name .. "_TT"):format(getPlayerCompleteName(true), getCompleteName(profile.characteristics or EMPTY, UNKNOWN, true));
+		return loc("REG_RELATION_" .. getRelation(profileID).id .. "_TT"):format(getPlayerCompleteName(true), getCompleteName(profile.characteristics or EMPTY, UNKNOWN, true));
 
 	end
 end
@@ -195,7 +207,8 @@ end
 local function onTargetButtonClicked(unitID, _, _, button)
 	local profileID = hasProfile(unitID);
 	local values = {};
-	tinsert(values, {loc("REG_RELATION"), nil});
+	tinsert(values, {loc("REG_RELATION"), nil})
+	tinsert(values, {loc("REG_RELATION_NONE"), "NONE"});
 	for id, relation in pairs(RELATIONS) do
 		tinsert(values, {relation.humanReadable or loc("REG_RELATION_" .. id), id});
 	end
