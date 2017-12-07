@@ -1,6 +1,4 @@
-<Ui xmlns="http://www.blizzard.com/wow/ui/"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
 
 	<!--
         Total RP 3
@@ -21,6 +19,26 @@
         limitations under the License.
     -->
 
+	<ScrollingMessageFrame name="TRP3_LogsFrame" secureMixin="ScrollingMessageFrameMixin" intrinsic="true">
+		<Frames>
+			<Frame parentKey="FontStringContainer" clipChildren="true" propagateHyperlinksToParent="true" setAllPoints="true" />
+		</Frames>
+		<Scripts>
+			<OnLoad method="OnPreLoad" intrinsicOrder="precall" />
+			<OnUpdate method="OnPostUpdate" intrinsicOrder="postcall" />
+			<OnShow method="OnPostShow" intrinsicOrder="postcall" />
+			<OnHide method="OnPostHide" intrinsicOrder="postcall" />
+			<OnSizeChanged method="OnPreSizeChanged" intrinsicOrder="precall" />
+			<OnMouseDown method="OnPostMouseDown" intrinsicOrder="postcall" autoEnableInput="false" />
+			<OnMouseUp method="OnPostMouseUp" intrinsicOrder="postcall" autoEnableInput="false" />
+		</Scripts>
+	</ScrollingMessageFrame>
+
+	<Script file="assertions.lua"/>
+	<Script file="strings.lua"/>
+	<Script file="colors.lua"/>
+	<Script file="logs.lua"/>
+	<Script file="tables.lua"/>
 	<Script file="localization.lua"/>
 	<Script file="workarounds.lua"/>
 

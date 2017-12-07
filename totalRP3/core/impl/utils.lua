@@ -17,25 +17,25 @@
 --	limitations under the License.
 ----------------------------------------------------------------------------------
 
--- Public accessor
-TRP3_API.utils = {
-	log = {},
-	table = {},
-	str = {},
-	color = {},
-	math = {},
-	serial = {},
-	event = {},
-	music = {},
-	texture = {},
-	message = {},
-	resources = {},
-};
+---@type TRP3_API
+local _, TRP3_API = ...;
+
 -- TRP3 imports
 local Globals = TRP3_API.globals;
 local Utils = TRP3_API.utils;
 local Log = Utils.log;
+local log = TRP3_API.utils.log.log;
 local loc = TRP3_API.locale.getText;
+
+-- Public accessor
+Utils.str = {};
+Utils.color = {};
+Utils.math = {};
+Utils.serial = {};
+Utils.event = {};
+Utils.texture = {};
+Utils.message = {};
+Utils.resources = {};
 
 -- WOW imports
 local pcall, tostring, pairs, type, print, string, date, math, strconcat, wipe, tonumber = pcall, tostring, pairs, type, print, string, date, math, strconcat, wipe, tonumber;
@@ -61,28 +61,6 @@ end
 Utils.print = function(...)
 	print(...);
 end
-
---*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
--- LOGGING
---*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-
--- The log level defines the prefix color and serves as filter
-Log.level = {
-	DEBUG = "-|cff00ffffDEBUG|r] ",
-	INFO = "-|cff00ff00INFO|r] ",
-	WARNING = "-|cffffaa00WARNING|r] ",
-	SEVERE = "-|cffff0000SEVERE|r] "
-}
-
--- Print a log message to the chatFrame.
-local function log(message, level)
-	if not level then level = Log.level.INFO; end
-	if not Globals.DEBUG_MODE then
-		return;
-	end
-	Utils.print( "[TRP3".. level ..tostring(message));
-end
-Log.log = log;
 
 --*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 -- Messaging
@@ -121,115 +99,6 @@ Utils.message.displayMessage = function(message, messageType, noPrefix, chatFram
 	elseif messageType == messageTypes.ALERT_MESSAGE then
 		UIErrorsFrame:AddMessage(message, 1.0, 0.0, 0.0);
 	end
-end
-
---*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
--- Table utils
---*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-
--- Print all table content (resursively)
--- Debug purpose
--- Better than /dump as it prints one message per line (avoid chat show limit)
-local dumpColor1, dumpColor2, dumpColor3, dumpColor4 = "|cffffaa00", "|cff00ff00", "|cffffff00", "|cffff9900";
-local function tableDump(table, level, withCount)
-	local i = 0;
-	local dumpIndent = "";
-
-	for indent = 1, level, 1 do
-		dumpIndent = dumpIndent .. "    ";
-	end
-	
-	if type(table) == "table" then
-		for key, value in pairs(table) do
-			if type(value) == "table" then
-				log(dumpIndent .. dumpColor2 .. key .. "|r=".. dumpColor3 .. "{", Log.level.DEBUG);
-				tableDump(value, level + 1);
-				log(dumpIndent .. dumpColor3 .. "}", Log.level.DEBUG);
-			elseif type(value) == "function" then
-				log(dumpIndent .. dumpColor2 .. key .. "|r=" .. dumpColor4 .. " <" .. type(value) ..">", Log.level.DEBUG);
-			else
-				log(dumpIndent .. dumpColor2 .. key .. "|r=" .. dumpColor3 .. tostring(value) .. dumpColor4 .. " <" .. type(value) ..">", Log.level.DEBUG);
-			end
-			i = i + 1;
-		end
-	end
-	
-	if withCount then
-		log(dumpIndent .. dumpColor1 .. ("Level %s size: %s elements"):format(level, i), Log.level.DEBUG);
-	end
-end
-
-Utils.table.dump = function(table, withCount)
-	log(dumpColor1 .. "Dump: ".. tostring(table), Log.level.DEBUG);
-	if table then
-		tableDump(table, 1, withCount);
-	end
-end
-
--- Recursively copy all content from a table to another one.
--- Argument "destination" must be a non nil table reference.
-local function tableCopy(destination, source)
-	if destination == nil or source == nil then return end
-	for k,v in pairs(source) do
-		if(type(v)=="table") then
-			destination[k] = {};
-			tableCopy(destination[k], v);
-		else
-			destination[k] = v;
-		end
-	end
-end
-Utils.table.copy = tableCopy;
-
--- Return the table size.
--- Less effective than #table but works for hash table as well (#hashtable don't).
-local function tableSize(table)
-	local count = 0;
-	for _,_ in pairs(table) do
-		count = count + 1;
-	end
-	return count;
-end
-Utils.table.size = tableSize;
-
--- Remove an object from table
--- Return true if the object is found.
--- Object is search with == operator.
-Utils.table.remove = function(table, object)
-	for index, value in pairs(table) do
-		if value == object then
-			tremove(table, index);
-			return true;
-		end
-	end
-	return false;
-end
-
-function Utils.table.keys(table)
-	local keys = {};
-	for key, _ in pairs(table) do
-		tinsert(keys, key);
-	end
-	return keys;
-end
-
--- Create a weak tables pool.
-local TABLE_POOL = setmetatable( {}, { __mode = "k" } );
-
--- Return an already created table, or a new one if the pool is empty
--- It ultra mega important to release the table once you finished using it !
-function Utils.table.getTempTable()
-	local t = next( TABLE_POOL );
-	if t then
-		TABLE_POOL[t] = nil;
-		return wipe(t);
-	end
-	return {};
-end
-
--- Release a temp table.
-function Utils.table.releaseTempTable(table)
-	TABLE_POOL[ table ] = true;
 end
 
 --*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -523,17 +392,7 @@ Utils.color.colorCodeFloatTab = function(tab)
 	return colorCode(math.ceil(tab.r*255), math.ceil(tab.g*255), math.ceil(tab.b*255));
 end
 
----
--- Function to test if a color is correctly readable on a specified.
--- We will calculate the luminance of the text color
--- using known values that take into account how the human eye perceive color
--- and then compute the contrast ratio.
--- The contrast ratio should be higher than 50%.
--- @external [](http://www.whydomath.org/node/wavlets/imagebasics.html)
---
--- @param textColor Color of the text {r, g, b}, must be 256 based
--- @return True if the text will be readable
---
+
 local textColorIsReadableOnBackground = function(textColor)
     return ((0.299 * textColor.r + 0.587 * textColor.g + 0.114 * textColor.b)) >= 0.5;
 end
@@ -1000,69 +859,6 @@ end
 
 function Utils.event.fireEvent(event, ...)
 	TRP3_EventDispatcher(TRP3_EventFrame, event, ...)
-end
-
---*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
--- MUSIC / SOUNDS
---*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-
-local soundHandlers = {};
-
-function Utils.music.getHandlers()
-	return soundHandlers;
-end
-
-function Utils.music.clearHandlers()
-	return wipe(soundHandlers);
-end
-
-function Utils.music.playSoundID(soundID, channel, source)
-	assert(soundID, "soundID can't be nil.")
-	local willPlay, handlerID = PlaySound(soundID, channel, false);
-	if willPlay then
-		tinsert(soundHandlers, {channel = channel, id = soundID, handlerID = handlerID, source = source, date = date("%H:%M:%S")});
-		if TRP3_SoundsHistoryFrame then
-			TRP3_SoundsHistoryFrame.onSoundPlayed();
-		end
-	end
-	return willPlay, handlerID;
-end
-
-function Utils.music.stopSound(handlerID)
-	StopSound(handlerID);
-end
-
-function Utils.music.stopChannel(channel)
-	for index, handler in pairs(soundHandlers) do
-		if not channel or handler.channel == channel then
-			Utils.music.stopSound(handler.handlerID);
-		end
-	end
-end
-
-function Utils.music.stopMusic()
-	StopMusic();
-	Utils.music.stopChannel("Music");
-end
-
-function Utils.music.playMusic(music, source)
-	assert(music, "Music can't be nil.")
-	Utils.music.stopMusic();
-	if type(music) == "number" then
-		Log.log("Playing sound: " .. music);
-		Utils.music.playSoundID(music, "Music");
-	else
-		Log.log("Playing music: " .. music);
-		PlayMusic("Sound\\Music\\" .. music .. ".mp3");
-		tinsert(soundHandlers, {channel = "Music", id = music, handlerID = 0, source = source or Globals.player_id, date = date("%H:%M:%S")});
-		if TRP3_SoundsHistoryFrame then
-			TRP3_SoundsHistoryFrame.onSoundPlayed();
-		end
-	end
-end
-
-function Utils.music.getTitle(musicURL)
-	return type(musicURL) == "number" and musicURL or musicURL:match("[%\\]?([^%\\]+)$");
 end
 
 --*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
