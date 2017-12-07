@@ -17,6 +17,9 @@
 -- limitations under the License.
 ----------------------------------------------------------------------------------
 
+---@type TRP3_API
+local _, TRP3_API = ...;
+
 -- Public accessor
 TRP3_API.register = {
 	inits = {},
@@ -30,6 +33,7 @@ TRP3_API.register.MENU_LIST_ID = "main_30_register";
 TRP3_API.register.MENU_LIST_ID_TAB = "main_31_";
 
 -- imports
+local Colors = TRP3_API.Colors;
 local Globals = TRP3_API.globals;
 local Utils = TRP3_API.utils;
 local stEtN = Utils.str.emptyToNil;
@@ -400,6 +404,17 @@ function TRP3_API.register.getUnitRPName(targetType)
 end
 
 TRP3_API.r.name = TRP3_API.register.getUnitRPName;
+
+--- Returns the custom color defined in the unitID's profile as a Color using Blizzard's ColorMixing.
+--- @param unitID string @ A unit ID (in the form of "PlayerName-RealmName")
+--- @return TRP3_ColorMixin|nil @ The custom RP color defined in the unit's profile
+function TRP3_API.register.getUnitCustomColor(unitID)
+	local info = getCharacterInfoTab(unitID);
+
+	if info.characteristics and info.characteristics.CH then
+		return Colors.createColorFromHexadecimalCode(info.characteristics.CH)
+	end
+end
 
 --*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 -- Tools

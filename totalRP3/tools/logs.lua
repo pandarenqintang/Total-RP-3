@@ -124,15 +124,3 @@ function Logs.list()
 		LogsFrame:AddMessage(log.messages);
 	end
 end
-
-
--- Backward compatibility layer
--- Map new system to the old one
-TRP3_API.utils.log = {};
-
-TRP3_API.utils.log.level = Logs.LEVELS;
-
-function TRP3_API.utils.log.log(message, level)
-	if not level then level = Logs.LEVELS.INFO end
-	Logs.log(level, message);
-end

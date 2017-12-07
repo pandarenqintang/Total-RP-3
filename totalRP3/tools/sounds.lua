@@ -85,6 +85,7 @@ function Sounds.clearHandlers()
 	return wipe(soundHandlers);
 end
 
+-- TODO I was mistaken here. Callbacks aren't the solution. We should fire an event instead.
 local playedSoundCallbacks = {};
 
 --- Register a new callback to be called everytime a sound is played.
@@ -182,15 +183,3 @@ end
 function Sounds.getTitle(musicURL)
 	return type(musicURL) == "number" and musicURL or musicURL:match("[%\\]?([^%\\]+)$");
 end
-
-
--- Backward compatibility
-TRP3_API.utils.music = TRP3_API.Sounds;
-
--- TODO Move this part of code to Extended's sound frame module
--- Manually register a played sound callback for Extended's sound history frame
-Sounds.registerOnSoundPlayedCallback(function()
-	if TRP3_SoundsHistoryFrame then
-		TRP3_SoundsHistoryFrame.onSoundPlayed();
-	end
-end);

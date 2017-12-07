@@ -1360,6 +1360,3 @@ function Locale.findBattlePetOwner(tooltipLines)
 		return master;
 	end
 end
-
--- Backward compatibility, map our new system to the old one
-TRP3_API.locale = TRP3_API.Locale;

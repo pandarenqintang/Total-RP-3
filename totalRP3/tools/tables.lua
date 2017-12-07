@@ -47,10 +47,10 @@ local isNotNil = TRP3_API.Assertions.isNotNil;
 
 local DEBUG_DUMP_LEVEL_SIZE = "Level %s size: %s elements";
 
-local DUMPCOLOR1 = Colors.CreateColorFromHexadecimalCode("ffaa00");
-local DUMPCOLOR2 = Colors.CreateColorFromHexadecimalCode("00ff00");
-local DUMPCOLOR3 = Colors.CreateColorFromHexadecimalCode("ffff00");
-local DUMPCOLOR4 = Colors.CreateColorFromHexadecimalCode("ff9900");
+local DUMPCOLOR1 = Colors.createColorFromHexadecimalCode("ffaa00");
+local DUMPCOLOR2 = Colors.createColorFromHexadecimalCode("00ff00");
+local DUMPCOLOR3 = Colors.createColorFromHexadecimalCode("ffff00");
+local DUMPCOLOR4 = Colors.createColorFromHexadecimalCode("ff9900");
 
 local VALUE_TYPE_FORMAT = "< %s >";
 
@@ -116,6 +116,13 @@ function Tables.dump(table, withCount)
 	if table then
 		tableDump(table, 1, withCount);
 	end
+end
+
+---Make use of WoW's shiny new table inspector window to inspect a table programatically
+---@param table table @ The table we want to inspect in WoW's table inspector
+function Tables.inspect(table)
+	UIParentLoadAddOn("Blizzard_DebugTools");
+	DisplayTableInspectorWindow(table);
 end
 
 --- Recursively copy all content from a table to another one.
@@ -213,6 +220,3 @@ function Tables.releaseTempTable(table)
 	assert(isType(table, "table", "table"));
 	TABLE_POOL[table] = true;
 end
-
--- Backward compatibility
-TRP3_API.utils.table = TRP3_API.Tables;

@@ -32,9 +32,12 @@ local tostring = tostring;
 local tConcat = table.concat;
 local assert = assert;
 local string = string;
+local match = string.match;
 local random = math.random;
 local date = date;
 local tinsert = table.insert;
+local pcall = pcall;
+local strconcat = strconcat;
 
 -- Total RP 3 imports
 local isType = TRP3_API.Assertions.isType;
@@ -105,6 +108,20 @@ function Strings.generateID()
 	return ID;
 end
 
+--- A secure way to check if a String matches a pattern.
+--- This is useful when using user-given pattern, as malformed pattern would produce lua error.
+---@param stringToCheck string @ The string in which we will search for the pattern
+---@param pattern string @ Lua matching pattern
+---@return number foundIndex @ The index at which the string was found
+function Strings.match(stringToCheck, pattern)
+	local ok, result = pcall(string.find, string.lower(stringToCheck), string.lower(pattern));
+	if not ok then
+		return false; -- Syntax error.
+	end
+	-- string.find should return a number if the string matches the pattern
+	return string.find(tostring(result), "%d");
+end
+
 --- Generate a pseudo-unique random ID while checking a table for possible collisions.
 ---@param table table @ A table where indexes are IDs generated via Strings.generateID
 ---@return string ID @ An ID that is not already used inside this table
@@ -114,4 +131,87 @@ function Strings.generateUniqueID(table)
 		ID = Strings.generateID();
 	end
 	return ID;
+end
+
+--- Create a unit ID from a unit name and unit realm. If realm = nil then we use current realm.
+--- This method ALWAYS return a nil free UnitName-RealmShortName string.
+---@param unitName string @ The unit name of the player
+---@param unitRealmID string @ The realm without spaces (WrymrestAccord)
+---@return unitID string @ A properly formatted unitID (PlayerName-RealmName)
+function Strings.unitInfoToID(unitName, unitRealmID)
+	-- Some functions (like GetPlayerInfoByGUID(GUID)) will return an empty string for the realm instead of null…
+	-- Thanks Blizz…
+	if not unitRealmID or unitRealmID == "" then
+		unitRealmID = TRP3_API.globals.player_realm_id
+	end
+	return strconcat(unitName or "_", '-', unitRealmID);
+end
+
+--- Separates the unit name and realm from an unit ID
+---@param unitID string @ A properly formatted unitID (PlayerName-RealmName)
+---@return unitName, unitRealm string,string @ Returns the unit name and the server of the unit
+function Strings.unitIDToInfo(unitID)
+	-- We can get unitID without a server, this means the unit is from the same server as the player
+	if not unitID:find('-') then
+		return unitID, TRP3_API.globals.player_realm_id;
+	end
+	return unitID:sub(1, unitID:find('-') - 1), unitID:sub(unitID:find('-') + 1);
+end
+
+--- Separates the owner ID and companion name from a companion ID
+---@param companionID string
+---@return string, string companionID, ownerID
+function Strings.companionIDToInfo(companionID)
+	if not companionID:find('_') then
+		return companionID, nil;
+	end
+	return companionID:sub(1, companionID:find('_') - 1), companionID:sub(companionID:find('_') + 1);
+end
+
+local TRP3_TAGS = {
+	END_OF_COLOR = "/col", -- {/col}
+	SINGLE_LETTER_COLOR = "^col%:(%a)$", -- {col:r}
+	HEXADECIMAL_COLOR_CODE = "^col:(%x%x%x%x%x%x)$", -- {col:aabbcc}
+	ICON = "^icon%:([%w%s%_%-%d]+)%:(%d+)$" -- {icon:texture:size}
+}
+
+local TEXT_TAGS = {
+	END_OF_COLOR = "|r"
+}
+
+local DIRECT_TAG_REPLACEMENTS = {
+	[TRP3_TAGS.END_OF_COLOR] = TEXT_TAGS.END_OF_COLOR,
+};
+
+---@param tag string @ Total RP 3 tag
+---@return string convertedTag @ Tag converted into a UI escape sequence
+local function convertTextTag(tag)
+
+	if DIRECT_TAG_REPLACEMENTS[tag] then -- Direct replacement
+		return DIRECT_TAG_REPLACEMENTS[tag];
+
+	-- Single character color shortcut replacement ({col:r})
+	elseif match(tag, TRP3_TAGS.SINGLE_LETTER_COLOR) then
+		local color = TRP3_API.Colors.get(match(tag, TRP3_TAGS.SINGLE_LETTER_COLOR));
+		return "|c" .. color:GenerateHexColor();
+
+	-- Hexa color code replacement ({col:aabbcc})
+	elseif match(tag, TRP3_TAGS.HEXADECIMAL_COLOR_CODE) then
+		return "|cff" .. match(tag, TRP3_TAGS.HEXADECIMAL_COLOR_CODE);
+
+	-- Icon tag replacement ({icon:texture:size})
+	elseif match(tag, TRP3_TAGS.ICON) then
+		local icon, size = match(tag, TRP3_TAGS.ICON);
+		return TRP3_API.Textures.iconTag(icon, size);
+	end
+
+	-- If nothing was found, the text is returned as it was before, including the { }
+	return "{"..tag.."}";
+end
+
+function Strings.convertTextTags(text)
+	if text then
+		text = text:gsub("%{(.-)%}", convertTextTag);
+		return text;
+	end
 end

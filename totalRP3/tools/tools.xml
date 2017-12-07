@@ -36,10 +36,16 @@
 
 	<Script file="assertions.lua"/>
 	<Script file="strings.lua"/>
+	<Script file="GUID.lua"/>
 	<Script file="colors.lua"/>
 	<Script file="logs.lua"/>
 	<Script file="tables.lua"/>
 	<Script file="localization.lua"/>
+	<Script file="unit.lua"/>
+	<Script file="html.lua"/>
+	<Script file="sounds.lua"/>
+	<Script file="events.lua"/>
 	<Script file="workarounds.lua"/>
+	<Script file="deprecated.lua"/>
 
 </Ui>

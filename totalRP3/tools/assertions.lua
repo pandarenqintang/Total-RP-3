@@ -32,10 +32,12 @@ TRP3_API.Assertions = Assertions;
 local type = type;
 local format = string.format;
 local next = next;
+local pairs = pairs;
 
 -- Error messages
 local DEBUG_NIL_PARAMETER = [[Unexpected nil parameter "%s".]];
 local DEBUG_WRONG_PARAM_TYPE = [[Invalid parameter type "%2$s" for parameter "%1$s", expected "%3$s".]];
+local DEBUG_WRONG_PARAM_TYPES = [[Invalid parameter type "%2$s" for parameter "%1$s", expected one of (%3$s).]];
 local DEBUG_EMPTY_PARAMETER = [[Parameter "%s" cannot be empty.]];
 
 ---Check if a variable is of the expected type
@@ -48,6 +50,36 @@ function Assertions.isType(variable, expectedType, variableName)
 	local isOfExpectedType = variableType == expectedType;
 	if not isOfExpectedType then
 		return false, format(DEBUG_WRONG_PARAM_TYPE, variableName, variableType, expectedType);
+	else
+		return true;
+	end
+end
+
+---Check if a variable is of one of the types expected
+---@param variable any @ Any kind of variable, to be tested for its type
+---@param expectedTypes string[] @ A list of expected types for the variable
+---@param variableName string @ The name of the variable being tested, will be visible in the error message
+---@return boolean, string isType, errorMessage @ Returns true if the variable was of the expected type, or false with an error message if it wasn't.
+function Assertions.isOfTypes(variable, expectedTypes, variableName)
+	local variableType = type(variable);
+	local isOfExpectedType = false;
+
+	for _, expectedType in pairs(expectedTypes) do
+		if variableType == expectedType then
+			isOfExpectedType = true;
+			break;
+		end
+	end
+
+	if not isOfExpectedType then
+		local expectedTypesString = "";
+		for _, expectedType in pairs(expectedTypes) do
+			if expectedTypesString ~= "" then
+				expectedTypesString = expectedTypesString .. "|";
+			end
+			expectedTypesString = expectedTypesString .. expectedType;
+		end
+		return false, format(DEBUG_WRONG_PARAM_TYPES, variableName, variableType, expectedTypesString);
 	else
 		return true;
 	end
