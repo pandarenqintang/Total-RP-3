@@ -40,7 +40,7 @@ local type = type;
 local Logs = TRP3_API.Logs;
 local isOfTypes = TRP3_API.Assertions.isOfTypes;
 
-local TEXTURE_TAG_PATTERN = "|T:%s:%s:%s|t";
+local TEXTURE_TAG_PATTERN = "|T%s:%s:%s|t";
 
 --- Return an texture text tag based on the given image url and size.
 ---@param texturePath string|number @ Either a texture path or a texture ID
@@ -48,7 +48,7 @@ local TEXTURE_TAG_PATTERN = "|T:%s:%s:%s|t";
 ---@param optional textureSizeY number @ The vertical size of the texture (default to textureSizeX)
 ---@return string textureTag @ A tag (escape sequence) to display the texture in a text
 function Textures.tag(texturePath, textureSizeX, textureSizeY)
-	assert(isOfTypes(texturePath, { "string", "number" }"texturePath"));
+	assert(isOfTypes(texturePath, { "string", "number" }, "texturePath"));
 	if not textureSizeX then
 		textureSizeX = 15;
 	end

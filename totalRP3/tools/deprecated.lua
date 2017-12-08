@@ -30,13 +30,15 @@ local setmetatable = setmetatable;
 local format = string.format;
 
 -- Localization keys
-local DEPRECATED_API_MOVED = [[Accessing Total RP 3's %s API via %s is deprecated and will be removed in an upcoming update. Please use %s instead.]];
-local DEPRECATED_FUNCTION = [[Function %s is deprecated and will be removed in an upcoming update. Please use %s instead.]];
+local DEPRECATED_API_MOVED = [[Accessing Total RP 3's %s API via %s is deprecated and will be removed in version %s. Please use %s instead.]];
+local DEPRECATED_FUNCTION = [[Function %s is deprecated and will be removed in version %s. Please use %s instead.]];
+
+local NEXT_DEPRECATION_VERSION = "1.4.0";
 
 local function setUpAPIDeprecatedWarning(newAPI, apiName, oldPath, newPath)
 	return setmetatable({}, {
 		__index = function(_, key)
-			TRP3_API.Logs.warning(format(DEPRECATED_API_MOVED, apiName, oldPath, newPath));
+			TRP3_API.Logs.warning(format(DEPRECATED_API_MOVED, apiName, oldPath, NEXT_DEPRECATION_VERSION, newPath));
 			return newAPI[key];
 		end,
 	});
@@ -44,10 +46,14 @@ end
 
 local function setUpDeprecatedFunctionWarning(newFunction, oldFunctionName, newFunctionName)
 	return function(...)
-		TRP3_API.Logs.warning(format(DEPRECATED_FUNCTION, oldFunctionName, newFunctionName));
-		newFunction(...);
+		TRP3_API.Logs.warning(format(DEPRECATED_FUNCTION, oldFunctionName, NEXT_DEPRECATION_VERSION, newFunctionName));
+		return newFunction(...);
 	end
 end
+
+--*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+-- Will be deprecated in version 1.4.0
+--*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 -- String API
 TRP3_API.utils.str = setUpAPIDeprecatedWarning(TRP3_API.Strings, "Strings", "TRP3_API.utils.str", "TRP3_API.Strings");
@@ -62,7 +68,9 @@ TRP3_API.utils.color.getColorFromHexadecimalCode = setUpDeprecatedFunctionWarnin
 TRP3_API.utils.color.GetClassColorByGUID = setUpDeprecatedFunctionWarning(TRP3_API.GUID.getClassColor, "TRP3_API.utils.color.GetClassColorByGUID", "TRP3_API.GUID.getClassColor");
 TRP3_API.utils.color.GetCustomColorByGUID = setUpDeprecatedFunctionWarning(TRP3_API.GUID.getCustomColor, "TRP3_API.utils.color.GetCustomColorByGUID", "TRP3_API.GUID.getCustomColor");
 TRP3_API.utils.color.getUnitColorByGUID = setUpDeprecatedFunctionWarning(TRP3_API.GUID.getUnitColor, "TRP3_API.utils.color.getUnitColorByGUID", "TRP3_API.GUID.getUnitColor");
-TRP3_API.utils.color.getUnitCustomColor = setUpDeprecatedFunctionWarning(TRP3_API.register.getUnitCustomColor, "TRP3_API.utils.color.getUnitCustomColor", "TRP3_API.register.getUnitCustomColor");
+TRP3_API.utils.color.getUnitCustomColor = setUpDeprecatedFunctionWarning(function(...)
+	TRP3_API.register.getUnitCustomColor(...);
+end , "TRP3_API.utils.color.getUnitCustomColor", "TRP3_API.register.getUnitCustomColor");
 TRP3_API.utils.str.color = setUpDeprecatedFunctionWarning(TRP3_API.Colors.get, "TRP3_API.utils.str.color", "TRP3_API.Colors.get");
 
 -- Events API
@@ -78,6 +86,7 @@ TRP3_API.locale = setUpAPIDeprecatedWarning(TRP3_API.Locale, "Locale", "TRP3_API
 -- Logs API
 -- Note we will avoid throwing warning when using the old logging API because it is already chatty enough and can lead to infinite loops :P
 TRP3_API.utils.log = {};
+print("Mapping log");
 TRP3_API.utils.log.level = TRP3_API.Logs.LEVELS;
 TRP3_API.utils.log.log = function(message, level)
 	if not level then level = TRP3_API.Logs.LEVELS.INFO end

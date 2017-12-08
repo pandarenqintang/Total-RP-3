@@ -66,7 +66,7 @@ end
 -- Only used for French related stuff, it's okay if non-latin characters are not here
 -- Note: We have a list of lowercase and uppercase letters here, because string.lower doesn't
 -- like accentuated uppercase letters at all, so we can't have just lowercase letters and apply a string.lower.
-local VOWELS = { "a", "e", "i", "o", "u", "y", "A"; "E", "I", "O", "U", "Y" "À", "Â", "Ä", "Æ", "È", "É", "Ê", "Ë", "Î", "Ï", "Ô", "Œ", "Ù", "Û", "Ü", "Ÿ", "à", "â", "ä", "æ", "è", "é", "ê", "ë", "î", "ï", "ô", "œ", "ù", "û", "ü", "ÿ" };
+local VOWELS = { "a", "e", "i", "o", "u", "y", "A"; "E", "I", "O", "U", "Y", "À", "Â", "Ä", "Æ", "È", "É", "Ê", "Ë", "Î", "Ï", "Ô", "Œ", "Ù", "Û", "Ü", "Ÿ", "à", "â", "ä", "æ", "è", "é", "ê", "ë", "î", "ï", "ô", "œ", "ù", "û", "ü", "ÿ" };
 VOWELS = tInvert(VOWELS); -- Invert the table so it is easier to check if something is a vowel
 
 ---@param letter string @ A single letter as a string (can be uppercase or lowercase)
@@ -80,7 +80,7 @@ end
 ---@return string letter @ The first letter in the string that was passed
 function Strings.getFirstLetter(text)
 	assert(isType(text, "string", "text"));
-	string.sub(text, 1, 1);
+	return string.sub(text, 1, 1);
 end
 
 -- Build a list of characters that can be used to generate IDs

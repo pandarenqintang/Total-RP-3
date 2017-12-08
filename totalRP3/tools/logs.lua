@@ -72,7 +72,7 @@ end
 ---@param level string @ The log level, one of Logs.LEVELS
 ---@return string header @ The header for the log entry
 local function getHeaderForLevel(level)
-	assert(isType(level, "text", "level"));
+	assert(isType(level, "string", "level"));
 	local header = format(LOG_HEADER_FORMAT, level);
 	local logColor = getLogColorForLevel(level);
 	return logColor:WrapTextInColorCode(header);
@@ -83,7 +83,7 @@ local logs = {};
 ---@param level string @ The log level, one of Logs.LEVELS
 ---@param ... string[] @ List of string to print
 function Logs.log(level, ...)
-	assert(isType(level, "text", "level"));
+	assert(isType(level, "string", "level"));
 	local message = strconcat(getHeaderForLevel(level), Strings.convertTableToString({ ... }));
 
 	tinsert(logs, {

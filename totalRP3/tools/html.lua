@@ -102,10 +102,10 @@ local SIMPLE_REPLACEMENTS = {
 -- List of the supporterd Markdown tags
 local MARKDOWN_TAGS = {
 	TITLES = {
-		"^(#+)(.-)\n"
-		"\n(#+)(.-)\n"
-		"\n(#+)(.-)$"
-		"^(#+)(.-)$"
+		"^(#+)(.-)\n",
+		"\n(#+)(.-)\n",
+		"\n(#+)(.-)$",
+		"^(#+)(.-)$",
 	},
 	TEXTURE = "%!%[(.-)%]%((.-)%)", -- ![path/to/texture](16,9) or ![iconName](25)
 	LINK = "%[(.-)%]%((.-)%)", -- [Google](www.google.com)

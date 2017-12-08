@@ -94,7 +94,7 @@ local playedSoundCallbacks = {};
 function Sounds.registerOnSoundPlayedCallback(callback)
 	assert(isType(callback, "function", "callback"));
 
-	local callbackID = Strings.Strings.generateUniqueID(playedSoundCallbacks);
+	local callbackID = Strings.generateUniqueID(playedSoundCallbacks);
 	playedSoundCallbacks[callbackID] = callback;
 	Logs.info("Registered new played sound callback with ID " .. callbackID);
 

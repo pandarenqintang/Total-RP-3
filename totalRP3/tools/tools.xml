@@ -45,6 +45,7 @@
 	<Script file="html.lua"/>
 	<Script file="sounds.lua"/>
 	<Script file="events.lua"/>
+	<Script file="textures.lua"/>
 	<Script file="workarounds.lua"/>
 	<Script file="deprecated.lua"/>
 
