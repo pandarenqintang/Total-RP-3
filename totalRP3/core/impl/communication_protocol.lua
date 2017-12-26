@@ -1,43 +1,62 @@
 ----------------------------------------------------------------------------------
--- Total RP 3
--- Communication protocol and API
---	---------------------------------------------------------------------------
---	Copyright 2014 Sylvain Cossement (telkostrasz@telkostrasz.be)
---
---	Licensed under the Apache License, Version 2.0 (the "License");
---	you may not use this file except in compliance with the License.
---	You may obtain a copy of the License at
---
---		http://www.apache.org/licenses/LICENSE-2.0
---
---	Unless required by applicable law or agreed to in writing, software
---	distributed under the License is distributed on an "AS IS" BASIS,
---	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
---	See the License for the specific language governing permissions and
---	limitations under the License.
+--- Total RP 3
+---
+--- Communication protocol and API
+---
+---	---------------------------------------------------------------------------
+---	Copyright 2014 Sylvain Cossement (telkostrasz@telkostrasz.be)
+--- Copyright 2017 Renaud "Ellypse" Parize <ellypse@totalrp3.info> @EllypseCelwe
+---
+---	Licensed under the Apache License, Version 2.0 (the "License");
+---	you may not use this file except in compliance with the License.
+---	You may obtain a copy of the License at
+---
+---		http://www.apache.org/licenses/LICENSE-2.0
+---
+---	Unless required by applicable law or agreed to in writing, software
+---	distributed under the License is distributed on an "AS IS" BASIS,
+---	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+---	See the License for the specific language governing permissions and
+---	limitations under the License.
 ----------------------------------------------------------------------------------
 
--- For debug
-local VERBOSE = false;
+---@type TRP3_API
+local _, TRP3_API = ...;
 
--- Public accessor
-TRP3_API.communication = {};
+local Communications = {};
+TRP3_API.Communications = Communications;
 
--- imports
+-- WoW imports
 local RegisterAddonMessagePrefix = RegisterAddonMessagePrefix;
-local tostring, pairs, assert, string, wipe, tinsert, type, math = tostring, pairs, assert, string, wipe, tinsert, type, math;
+local tostring = tostring;
+local pairs = pairs;
+local assert = assert;
+local string = string;
+local wipe = wipe;
+local tinsert = table.insert;
+local type = type;
+local math = math;
 local tconcat = table.concat;
+
+-- Libraries imports
 local ChatThrottleLib = ChatThrottleLib;
-local Utils = TRP3_API.utils;
-local Log = Utils.log;
-local Comm, isIDIgnored = TRP3_API.communication;
 local libSerializer = LibStub:GetLibrary("AceSerializer-3.0");
+
+-- Total RP 3 imports
+local isType = TRP3_API.Assertions.isType;
+local warning = TRP3_API.Logs.warning;
+local debug = TRP3_API.Logs.debug;
+local severe = TRP3_API.Logs.severe;
+local GameEvents = TRP3_API.GameEvents;
+local Serial = TRP3_API.Serial;
+local VERBOSE = TRP3_API.Globals.DEBUG_MODE;
 
 -- function definition
 local handlePacketsIn;
 local handleStructureIn;
 local receiveObject;
 local onAddonMessageReceived;
+local isIDIgnored;
 
 --*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 -- LAYER 0 : CONNECTION LAYER
@@ -50,15 +69,15 @@ local interface_id = {
 	DIRECT_RELAY = 2,
 	DIRECT_PRINT = 3
 };
-Comm.total = 0;
-Comm.totalReceived = 0;
-Comm.interface_id = interface_id;
+Communications.total = 0;
+Communications.totalReceived = 0;
+Communications.interface_id = interface_id;
 local selected_interface_id = interface_id.WOW;
 
-function Comm.init()
+function Communications.init()
 	isIDIgnored = TRP3_API.register.isIDIgnored;
-	Utils.event.registerHandler("CHAT_MSG_ADDON", onAddonMessageReceived);
-	Utils.event.registerHandler("PLAYER_ENTERING_WORLD", function() 
+	GameEvents.registerHandler("CHAT_MSG_ADDON", onAddonMessageReceived);
+	GameEvents.registerHandler("PLAYER_ENTERING_WORLD", function()
 		RegisterAddonMessagePrefix(wowCom_prefix);
 	end);
 end
@@ -81,10 +100,10 @@ function onAddonMessageReceived(...)
 	local prefix, packet , distributionType, sender = ...;
 	if prefix == wowCom_prefix then
 		if not sender or not sender:find('-') then
-			Log.log("Malformed senderID: " .. tostring(sender), Log.level.WARNING);
+			warning("Malformed senderID: " .. tostring(sender));
 			return;
 		end
-		Comm.totalReceived = Comm.totalReceived + prefix:len() + packet:len();
+		Communications.totalReceived = Communications.totalReceived + prefix:len() + packet:len();
 		handlePacketsIn(packet, sender);
 	end
 end
@@ -92,8 +111,8 @@ end
 -- This communication interface print all sent message to the chat frame.
 -- Note that the messages are not really sent.
 local function directPrint(packet, target, priority)
-	Log.log("Message to: "..tostring(target).." - Priority: "..tostring(priority)..(" - Message(%s):"):format(packet:len()));
-	Log.log(packet);
+	debug("Message to: "..tostring(target).." - Priority: "..tostring(priority)..(" - Message(%s):"):format(packet:len()));
+	debug(packet);
 end
 
 -- A "direct relay" (like localhost) communication interface, used for development purpose.
@@ -112,7 +131,7 @@ local function getCommunicationInterface()
 end
 
 -- Changes the communication interface to use
-function Comm.setInterfaceID(id)
+function Communications.setInterfaceID(id)
 	selected_interface_id = id;
 end
 
@@ -151,7 +170,7 @@ local function handlePacketsOut(messageID, packets, target, priority)
 			end
 			local str = messageID .. control .. total256 .. packet;
 			local size = str:len() + wowCom_prefix:len();
-			Comm.total = Comm.total + size;
+			Communications.total = Communications.total + size;
 			getCommunicationInterface()(str, target, priority);
 
 		end
@@ -170,7 +189,7 @@ local function savePacket(sender, messageID, packet, total)
 	tinsert(PACKETS_RECEPTOR[sender][messageID], packet);
 
 	if VERBOSE then
-		Log.log(("savePacket(%s, %s, packet, %s / %s)"):format(sender, messageID, #PACKETS_RECEPTOR[sender][messageID], total));
+		debug(("savePacket(%s, %s, packet, %s / %s)"):format(sender, messageID, #PACKETS_RECEPTOR[sender][messageID], total));
 	end
 
 	-- Triggers packet handlers
@@ -181,7 +200,7 @@ local function savePacket(sender, messageID, packet, total)
 	end
 end
 
-function Comm.addMessageIDHandler(target, messageID, callback)
+function Communications.addMessageIDHandler(target, messageID, callback)
 	if not PACKET_MESSAGE_HANDLERS[target] then PACKET_MESSAGE_HANDLERS[target] = {} end
 	if not PACKET_MESSAGE_HANDLERS[target][messageID] then PACKET_MESSAGE_HANDLERS[target][messageID] = {} end
 	tinsert(PACKET_MESSAGE_HANDLERS[target][messageID], callback);
@@ -230,7 +249,7 @@ end
 local MESSAGE_ID = 1;
 
 -- Message IDs are 74 base number encoded on 2 chars (74*74 = 5476 available Message IDs)
-local function getMessageIDAndIncrement()
+function Communications.getMessageIDAndIncrement()
 	local toReturn = code(MESSAGE_ID);
 	MESSAGE_ID = MESSAGE_ID + 1;
 	if MESSAGE_ID >= ID_MAX_VALUE then
@@ -238,12 +257,11 @@ local function getMessageIDAndIncrement()
 	end
 	return toReturn;
 end
-Comm.getMessageIDAndIncrement = getMessageIDAndIncrement;
 
 -- Convert structure to message, cut message in packets.
 local function handleStructureOut(structure, target, priority, messageID)
 	local message = libSerializer:Serialize(structure);
-	local messageID = messageID or getMessageIDAndIncrement();
+	messageID = messageID or Communications.getMessageIDAndIncrement();
 	local messageSize = message:len();
 	local packetTab = {};
 	local index = 1;
@@ -261,8 +279,8 @@ function handleStructureIn(packets, sender, messageID)
 	if status then
 		receiveObject(structure, sender, messageID);
 	else
-		Utils.serial.errorCount = Utils.serial.errorCount + 1;
-		Log.log(("Deserialization error from %s. Message:\n%s"):format(sender, message), Log.level.SEVERE);
+		Serial.errorCount = Serial.errorCount + 1;
+		severe(("Deserialization error from %s. Message:\n%s"):format(sender, message));
 	end
 end
 
@@ -274,8 +292,9 @@ end
 local PREFIX_REGISTRATION = {};
 
 -- Register a function to callback when receiving a object attached to the given prefix
-function Comm.registerProtocolPrefix(prefix, callback)
-	assert(prefix and callback and type(callback) == "function", "Usage: prefix, callback");
+function Communications.registerProtocolPrefix(prefix, callback)
+	assert(isType(prefix), "string", "prefix");
+	assert(isType(callback, "function", "callback"));
 	if PREFIX_REGISTRATION[prefix] == nil then
 		PREFIX_REGISTRATION[prefix] = {};
 	end
@@ -286,17 +305,17 @@ end
 -- Prefix must have been registered before use this function
 -- The object can be any lua type (numbers, strings, tables, but NOT functions or userdatas)
 -- Priority is optional ("Bulk" by default)
-function Comm.sendObject(prefix, object, target, priority, messageID)
+function Communications.sendObject(prefix, object, target, priority, messageID)
 	assert(PREFIX_REGISTRATION[prefix] ~= nil, "Unregistered prefix: "..prefix);
 	if not isIDIgnored(target) then
 		if isSpecialTarget(target) or target:match("[^%-]+%-[^%-]+") then
 			if VERBOSE then
-				Log.log(("Send to %s with prefix %s"):format(target, prefix));
+				debug(("Send to %s with prefix %s"):format(target, prefix));
 			end
 			local structure = {prefix, object};
 			handleStructureOut(structure, target, priority, messageID);
 		else
-			Log.log("Trying to send data to bad formed target: " .. target, Log.level.WARNING);
+			warning("Trying to send data to bad formed target: " .. target);
 			return; -- Avoid display "The player "Pouic-" doesn't seemed to be online".
 		end
 	end
@@ -309,22 +328,22 @@ function receiveObject(structure, sender, messageID)
 	if type(structure) == "table" and #structure == 2 then
 		local prefix = structure[1];
 		if VERBOSE then
-			Log.log(("Received from %s with prefix %s"):format(sender, prefix));
+			debug(("Received from %s with prefix %s"):format(sender, prefix));
 		end
 		if PREFIX_REGISTRATION[prefix] then
 			for _, callback in pairs(PREFIX_REGISTRATION[prefix]) do
 				callback(structure[2], sender, messageID);
 			end
 		else
-			Log.log("No registration for prefix: " .. prefix, Log.level.INFO);
+			debug("No registration for prefix: " .. prefix);
 		end
 	else
-		Log.log("Bad structure composition.", Log.level.SEVERE);
+		severe("Bad structure composition.");
 	end
 end
 
 -- Estimate the number of packet needed to send a object.
-function Comm.estimateStructureLoad(object)
+function Communications.estimateStructureLoad(object)
 	assert(object, "Object nil");
 	return math.ceil((#(libSerializer:Serialize({"MOCK", object}))) / AVAILABLE_CHARACTERS);
 end

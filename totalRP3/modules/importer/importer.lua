@@ -99,7 +99,7 @@ TRP3_API.events.listenToEvent(TRP3_API.events.WORKFLOW_ON_LOAD, function()
 			end
 			);
 		end
-		playUISound("Sound\\Interface\\Ui_Pet_Levelup_01.wav", true);
+		playUISound(SOUNDKIT.UI_GARRISON_COMMAND_TABLE_FOLLOWER_LEVEL_UP);
 	end
 
 	local function initProfiles()
@@ -129,7 +129,7 @@ TRP3_API.events.listenToEvent(TRP3_API.events.WORKFLOW_ON_LOAD, function()
 		importProfile(button:GetParent().addOn, button:GetParent().profileID);
 		playAnimation(_G[button:GetParent():GetName() .. "Animate"]);
 		playAnimation(_G[button:GetParent():GetName() .. "HighlightAnimate"]);
-		playUISound("Sound\\Interface\\Ui_Pet_Levelup_01.wav", true);
+		playUISound(SOUNDKIT.UI_GARRISON_COMMAND_TABLE_FOLLOWER_LEVEL_UP);
 	end
 
 	local function decorateProfileList(widget, id)

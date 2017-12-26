@@ -366,9 +366,9 @@ local function onStart()
 	function TRP3_API.toolbar.switch()
 		if toolbar:IsVisible() then
 			toolbar:Hide()
-			TRP3_API.ui.misc.playUISound("GAMEDIALOGCLOSE");
+			TRP3_API.ui.misc.playUISound(SOUNDKIT.IG_MAINMENU_CLOSE);
 		else
-			TRP3_API.ui.misc.playUISound("GAMEDIALOGOPEN");
+			TRP3_API.ui.misc.playUISound(SOUNDKIT.IG_MAINMENU_OPEN);
 			toolbar:Show();
 		end
 	end

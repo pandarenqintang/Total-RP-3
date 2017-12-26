@@ -35,6 +35,8 @@
 	</ScrollingMessageFrame>
 
 	<Script file="assertions.lua"/>
+	<!-- Events must be loaded as soon as possible so we can listen to the WORKFLOW_ON_LOADED event here -->
+	<Script file="events.lua"/>
 	<Script file="strings.lua"/>
 	<Script file="GUID.lua"/>
 	<Script file="colors.lua"/>
@@ -45,10 +47,12 @@
 	<Script file="messages.lua"/>
 	<Script file="localization.lua"/>
 	<Script file="unit.lua"/>
+	<Script file="animations.lua"/>
 	<Script file="html.lua"/>
 	<Script file="sounds.lua"/>
-	<Script file="events.lua"/>
+	<Script file="gameEvents.lua"/>
 	<Script file="textures.lua"/>
+	<Script file="frames.lua"/>
 	<Script file="map.lua"/>
 	<Script file="workarounds.lua"/>
 	<Script file="deprecated.lua"/>

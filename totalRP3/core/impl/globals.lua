@@ -1,35 +1,36 @@
 ----------------------------------------------------------------------------------
--- Total RP 3
--- Global variables
---	---------------------------------------------------------------------------
---	Copyright 2014 Sylvain Cossement (telkostrasz@telkostrasz.be)
---	Copyright 2014 Renaud Parize (Ellypse) (ellypse@totalrp3.info)
---
---	Licensed under the Apache License, Version 2.0 (the "License");
---	you may not use this file except in compliance with the License.
---	You may obtain a copy of the License at
---
---		http://www.apache.org/licenses/LICENSE-2.0
---
---	Unless required by applicable law or agreed to in writing, software
---	distributed under the License is distributed on an "AS IS" BASIS,
---	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
---	See the License for the specific language governing permissions and
---	limitations under the License.
+--- Total RP 3
+--- Global variables
+---	---------------------------------------------------------------------------
+---	Copyright 2014 Sylvain Cossement (telkostrasz@telkostrasz.be)
+---	Copyright 2017 Renaud "Ellypse" Parize <ellypse@totalrp3.info> @EllypseCelwe
+---
+---	Licensed under the Apache License, Version 2.0 (the "License");
+---	you may not use this file except in compliance with the License.
+---	You may obtain a copy of the License at
+---
+---		http://www.apache.org/licenses/LICENSE-2.0
+---
+---	Unless required by applicable law or agreed to in writing, software
+---	distributed under the License is distributed on an "AS IS" BASIS,
+---	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+---	See the License for the specific language governing permissions and
+---	limitations under the License.
 ----------------------------------------------------------------------------------
+
+---@type TRP3_API
+local _, TRP3_API = ...;
+
+-- Total RP 3 imports
+local Serial = TRP3_API.Serial;
+local Textures = TRP3_API.Textures;
+local Unit = TRP3_API.Unit;
 
 local race_loc, race = UnitRace("player");
 local class_loc, class, class_index = UnitClass("player");
 local faction, faction_loc = UnitFactionGroup("player");
 
----@type TRP3_API
-local _, AddOn = ...;
-
-AddOn.r = {};
-AddOn.formats = {
-	dropDownElements = "%s: |cff00ff00%s"
-};
-AddOn.globals = {
+local Globals = {
 	--@debug@
 	DEBUG_MODE = true,
 	--@end-debug@
@@ -81,33 +82,35 @@ AddOn.globals = {
 	},
 };
 
--- Public accessor
-TRP3_API = AddOn;
+TRP3_API.Globals = Globals;
 
-local emptyMeta = {
-	__newindex = function(_, _, _) end
+TRP3_API.formats = {
+	dropDownElements = "%s: |cff00ff00%s"
 };
-setmetatable(TRP3_API.globals.empty, emptyMeta);
+
+setmetatable(Globals.empty, {
+	__newindex = function() end
+});
 
 --*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 -- Globals build
 --*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
-TRP3_API.globals.build = function()
+function Globals.build()
 	local fullName, realm = UnitFullName("player");
 	assert(realm, "Cannot have realm name information !");
-	TRP3_API.globals.player_realm_id = realm;
-	TRP3_API.globals.player_id = fullName .. "-" .. realm;
-	TRP3_API.globals.player_icon = TRP3_API.ui.misc.getUnitTexture(race, UnitSex("player"));
+	Globals.player_realm_id = realm;
+	Globals.player_id = Unit.getUnitID("player");
+	Globals.player_icon = Textures.getUnitTexture(race, UnitSex("player"));
 
 	-- Build BNet account Hash
 	local bn = select(2, BNGetInfo());
 	if bn then
-		TRP3_API.globals.player_hash = TRP3_API.utils.serial.hashCode(bn);
+		Globals.player_hash = Serial.hashCode(bn);
 	else
 		-- Trial account ..etc.
-		TRP3_API.globals.player_hash = TRP3_API.utils.serial.hashCode(TRP3_API.globals.player_id);
+		Globals.player_hash = Serial.hashCode(Globals.player_id);
 	end
 end
 
-TRP3_API.globals.addon = LibStub("AceAddon-3.0"):NewAddon(TRP3_API.globals.addon_name);
+Globals.addon = LibStub("AceAddon-3.0"):NewAddon(Globals.addon_name);

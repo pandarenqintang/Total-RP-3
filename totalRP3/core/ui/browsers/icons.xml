@@ -20,7 +20,7 @@
 -->
 	
 	<!-- Icon browser button  -->
-	<Button name="TRP3_IconBrowserButton" virtual="true">
+	<Button name="TRP3_IconBrowserButton" inherits="TRP3_MainTooltipMouseOverScripts" virtual="true">
 		<Size x="40" y="40"/>
 	    <NormalTexture file="Interface\ICONS\INV_Misc_QuestionMark">
 			<Size x="40" y="40"/>
@@ -35,12 +35,6 @@
 			<OnLoad>
 				self:RegisterForClicks("LeftButtonUp", "RightButtonUp");
 			</OnLoad>
-			<OnEnter>
-				TRP3_RefreshTooltipForFrame(self);
-			</OnEnter>
-			<OnLeave>
-				TRP3_MainTooltip:Hide();
-			</OnLeave>
 		</Scripts>
 	</Button>
 	

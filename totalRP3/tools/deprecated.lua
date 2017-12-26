@@ -95,6 +95,7 @@ end
 -- Sounds API
 TRP3_API.utils.music = setUpAPIDeprecatedWarning(TRP3_API.Sounds, "Sounds", "TRP3_API.utils.music", "TRP3_API.Sounds");
 TRP3_API.ui.misc.playSoundKit = setUpDeprecatedFunctionWarning(TRP3_API.Sounds.playUISound, "TRP3_API.ui.misc.playSoundKit", "TRP3_API.Sounds.playUISound");
+TRP3_API.ui.misc.playUISound = setUpDeprecatedFunctionWarning(TRP3_API.Sounds.playUISound, "TRP3_API.ui.misc.playUISound", "TRP3_API.Sounds.playUISound");
 -- Manually register a played sound callback for Extended's sound history frame
 TRP3_API.Sounds.registerOnSoundPlayedCallback(function()
 	if TRP3_SoundsHistoryFrame then
@@ -109,6 +110,8 @@ TRP3_API.utils.table = setUpAPIDeprecatedWarning(TRP3_API.Tables, "Tables", "TRP
 TRP3_API.utils.texture = setUpAPIDeprecatedWarning(TRP3_API.Textures, "Textures", "TRP3_API.utils.texture", "TRP3_API.Textures");
 TRP3_API.utils.str.texture = setUpDeprecatedFunctionWarning(TRP3_API.Textures.tag, "TRP3_API.utils.str.texture", "TRP3_API.Textures.tag");
 TRP3_API.utils.str.icon = setUpDeprecatedFunctionWarning(TRP3_API.Textures.iconTag, "TRP3_API.utils.str.icon", "TRP3_API.Textures.iconTag");
+TRP3_API.ui.misc.getUnitTexture = setUpDeprecatedFunctionWarning(TRP3_API.Textures.getUnitTexture, "TRP3_API.ui.misc.getUnitTexture", "TRP3_API.Textures.getUnitTexture");
+TRP3_API.ui.misc.getClassTexture = setUpDeprecatedFunctionWarning(TRP3_API.Textures.getClassTexture, "TRP3_API.ui.misc.getClassTexture", "TRP3_API.Textures.getClassTexture");
 
 -- Unit API
 TRP3_API.utils.str.GetGuildName = setUpDeprecatedFunctionWarning(TRP3_API.Unit.getGuildName, "TRP3_API.utils.str.GetGuildName", "TRP3_API.Unit.getGuildName");
@@ -156,3 +159,21 @@ TRP3_API.configuration = setUpAPIDeprecatedWarning(TRP3_API.Configuration, "Conf
 
 -- Configuration API
 TRP3_API.slash = setUpAPIDeprecatedWarning(TRP3_API.Slash, "Slash", "TRP3_API.slash", "TRP3_API.Slash");
+
+-- UI Animations
+TRP3_API.ui.misc.playAnimation = setUpDeprecatedFunctionWarning(TRP3_API.Animations.playAnimation, "TRP3_API.ui.misc.playAnimation", "TRP3_API.Animations.playAnimation");
+
+-- Globals
+TRP3_API.globals = setUpAPIDeprecatedWarning(TRP3_API.Globals, "Globals", "TRP3_API.globals", "TRP3_API.Globals");
+
+-- Communications API
+TRP3_API.communication = setUpAPIDeprecatedWarning(TRP3_API.Communications, "Communications", "TRP3_API.communication", "TRP3_API.Communications");
+TRP3_API.communication.broadcast = setUpAPIDeprecatedWarning(TRP3_API.Broadcast, "Broadcast", "TRP3_API.communication.broadcast", "TRP3_API.Broadcast");
+
+-- Popups
+TRP3_API.popup = setUpAPIDeprecatedWarning(TRP3_API.Popups, "Popups", "TRP3_API.popup", "TRP3_API.Popups");
+
+-- Frames API
+TRP3_API.ui.frame = setUpAPIDeprecatedWarning(TRP3_API.Frames, "Frames", "TRP3_API.ui.frame", "TRP3_API.Frames");
+TRP3_API.ui.frame.setupMove = setUpDeprecatedFunctionWarning(TRP3_API.Frames.makeMovable, "TRP3_API.ui.frame.setupMove", "TRP3_API.Frames.makeMovable");
+TRP3_API.ui.frame.configureHoverFrame = setUpDeprecatedFunctionWarning(TRP3_API.Frames.configureHoverFrame, "TRP3_API.ui.frame.configureHoverFrame", "TRP3_API.Frames.configureHoverFrame");

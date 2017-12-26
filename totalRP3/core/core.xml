@@ -20,7 +20,6 @@
 -->
 	
 	<!-- Please note that the loading order matters a lot -->
-	<GameTooltip name="TRP3_MainTooltip" frameStrata="TOOLTIP" hidden="false" parent="UIParent" inherits="GameTooltipTemplate"/>
 	<GameTooltip name="TRP3_Toast" frameStrata="TOOLTIP" hidden="false" parent="UIParent" inherits="GameTooltipTemplate">
 		<Scripts>
 			<OnHide>
@@ -44,7 +43,6 @@
 	</Frame>
 	
 	<Script file="impl\globals.lua"/>
-	<Script file="impl\events.lua"/>
 	<Include file="impl\locale\locale.xml"/>
 	<Script file="impl\ui_tools.lua"/>
 	<Script file="impl\slash.lua"/>

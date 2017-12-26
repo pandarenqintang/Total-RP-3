@@ -487,7 +487,7 @@ TRP3_API.events.listenToEvent(TRP3_API.events.WORKFLOW_ON_LOAD, function()
 		local widget = _G["TRP3_CompanionsProfilesListLine"..i];
 		widget:SetScript("OnMouseUp",function (self)
 			onOpenProfile(widget);
-			playUISound("gsCharacterSelection");
+			playUISound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
 		end);
 		_G[widget:GetName().."Action"]:SetScript("OnClick", onActionClicked);
 		_G[widget:GetName().."Bound"]:SetText(loc("REG_COMPANION_BOUNDS"));

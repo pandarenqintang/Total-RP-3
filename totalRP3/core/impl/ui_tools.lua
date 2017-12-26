@@ -38,10 +38,6 @@ local UnitIsBattlePetCompanion, UnitIsUnit, UnitIsOtherPlayersPet, UnitIsOtherPl
 local UnitIsPlayer = UnitIsPlayer;
 local getUnitID = TRP3_API.utils.str.getUnitID;
 local numberToHexa = TRP3_API.utils.color.numberToHexa;
-local tcopy = TRP3_API.utils.table.copy;
-
-local CONFIG_UI_SOUNDS = "ui_sounds";
-local CONFIG_UI_ANIMATIONS = "ui_animations";
 
 --*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 -- Frame utils
@@ -79,15 +75,6 @@ function TRP3_API.ui.frame.getTiledBackgroundList()
 		tinsert(tab, {loc("UI_BKG"):format(tostring(index)), index, "|T" .. texture .. ":200:200|t"});
 	end
 	return tab;
-end
-
-function TRP3_API.ui.frame.showIfMouseOverFrame(frame, frameOver)
-	assert(frame and frameOver, "Frames can't be nil");
-	if MouseIsOver(frameOver) then
-		frame:Show();
-	else
-		frame:Hide();
-	end
 end
 
 function TRP3_API.ui.frame.createRefreshOnFrame(frame, time, callback)
@@ -187,7 +174,7 @@ local function openDropDown(anchoredFrame, values, callback, space, addCancel)
 	);
 	dropDownFrame:SetParent(anchoredFrame);
 	ToggleDropDownMenu(1, nil, dropDownFrame, anchoredFrame:GetName() or "cursor", -((space or -10)), 0);
-	TRP3_API.ui.misc.playUISound("igMainMenuOptionCheckBoxOn");
+	TRP3_API.ui.misc.playUISound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
 	currentlyOpenedDrop = anchoredFrame;
 end
 TRP3_API.ui.listbox.displayDropDown = openDropDown;
@@ -379,96 +366,6 @@ TRP3_API.ui.list.initList = function(infoTab, dataTab, slider)
 end
 
 --*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
--- Tooltip tools
---*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-
-TRP3_API.ui.tooltip.CONFIG_TOOLTIP_SIZE = "CONFIG_TOOLTIP_SIZE";
-local CONFIG_TOOLTIP_SIZE = TRP3_API.ui.tooltip.CONFIG_TOOLTIP_SIZE;
-local getConfigValue;
-
-TRP3_API.events.listenToEvent(TRP3_API.events.WORKFLOW_ON_LOADED, function()
-	TRP3_API.configuration.registerConfigKey(TRP3_API.ui.tooltip.CONFIG_TOOLTIP_SIZE, 11);
-	getConfigValue = TRP3_API.configuration.getValue;
-end);
-
-local function getTooltipSize()
-	return getConfigValue(CONFIG_TOOLTIP_SIZE) or 11;
-end
-
--- Show the tooltip for this Frame (the frame must have been set up with setTooltipForFrame).
--- If already shown, the tooltip text will be refreshed.
-local function refreshTooltip(Frame)
-	if Frame.titleText and Frame.GenFrame and Frame.GenFrameX and Frame.GenFrameY and Frame.GenFrameAnch then
-		TRP3_MainTooltip:Hide();
-		TRP3_MainTooltip:SetOwner(Frame.GenFrame, Frame.GenFrameAnch,Frame.GenFrameX,Frame.GenFrameY);
-		if not Frame.rightText then
-			TRP3_MainTooltip:AddLine(Frame.titleText, 1, 1, 1, true);
-		else
-			TRP3_MainTooltip:AddDoubleLine(Frame.titleText, Frame.rightText);
-			local font, _, flag = TRP3_MainTooltipTextRight1:GetFont();
-			TRP3_MainTooltipTextRight1:SetFont(font, getTooltipSize() + 4, flag);
-			TRP3_MainTooltipTextRight1:SetNonSpaceWrap(true);
-			TRP3_MainTooltipTextRight1:SetTextColor(1, 1, 1);
-		end
-		local font, _, flag = TRP3_MainTooltipTextLeft1:GetFont();
-		TRP3_MainTooltipTextLeft1:SetFont(font, getTooltipSize() + 4, flag);
-		TRP3_MainTooltipTextLeft1:SetNonSpaceWrap(true);
-		TRP3_MainTooltipTextLeft1:SetTextColor(1, 1, 1);
-		if Frame.bodyText then
-			TRP3_MainTooltip:AddLine(Frame.bodyText, 1, 0.6666, 0, true);
-			local font, _, flag = TRP3_MainTooltipTextLeft2:GetFont();
-			TRP3_MainTooltipTextLeft2:SetFont(font, getTooltipSize(), flag);
-			TRP3_MainTooltipTextLeft2:SetNonSpaceWrap(true);
-			TRP3_MainTooltipTextLeft2:SetTextColor(1, 0.75, 0);
-		end
-		TRP3_MainTooltip:Show();
-	end
-end
-TRP3_API.ui.tooltip.refresh = refreshTooltip;
-TRP3_RefreshTooltipForFrame = refreshTooltip; -- For XML integration without too much perf' issue
-
-local function tooltipSimpleOnEnter(self)
-	refreshTooltip(self);
-end
-
-local function tooltipSimpleOnLeave(self)
-	TRP3_MainTooltip:Hide();
-end
-
--- Setup the frame tooltip (position and text)
--- The tooltip can be shown by using refreshTooltip(Frame)
-local function setTooltipForFrame(Frame, GenFrame, GenFrameAnch, GenFrameX, GenFrameY, titleText, bodyText, rightText)
-	assert(Frame and GenFrame, "Frame and GenFrame cannot be nil.");
-	if Frame and GenFrame then
-		Frame.GenFrame = GenFrame;
-		Frame.GenFrameX = GenFrameX;
-		Frame.GenFrameY = GenFrameY;
-		Frame.titleText = titleText;
-		Frame.bodyText = bodyText;
-		Frame.rightText = rightText;
-		if GenFrameAnch then
-			Frame.GenFrameAnch = "ANCHOR_"..GenFrameAnch;
-		else
-			Frame.GenFrameAnch = "ANCHOR_TOPRIGHT";
-		end
-	end
-end
-TRP3_API.ui.tooltip.setTooltipForFrame = setTooltipForFrame;
-
--- Setup the frame tooltip (position and text)
--- The tooltip can be shown by using refreshTooltip(Frame)
-TRP3_API.ui.tooltip.setTooltipForSameFrame = function(Frame, GenFrameAnch, GenFrameX, GenFrameY, titleText, bodyText, rightText)
-	setTooltipForFrame(Frame, Frame, GenFrameAnch, GenFrameX, GenFrameY, titleText, bodyText, rightText);
-end
-
--- Setup the frame tooltip and add the Enter and Leave scripts
-TRP3_API.ui.tooltip.setTooltipAll = function(Frame, GenFrameAnch, GenFrameX, GenFrameY, titleText, bodyText, rightText)
-	Frame:SetScript("OnEnter", tooltipSimpleOnEnter);
-	Frame:SetScript("OnLeave", tooltipSimpleOnLeave);
-	setTooltipForFrame(Frame, Frame, GenFrameAnch, GenFrameX, GenFrameY, titleText, bodyText, rightText);
-end
-
---*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 -- Companion ID
 --*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
@@ -566,16 +463,6 @@ function TRP3_API.ui.tooltip.toast(text, duration)
 end
 
 --*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
--- Icon utils
---*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-
-function TRP3_API.ui.frame.setupIconButton(self, icon)
-	assert(self, "Frame is nil");
-	assert(self.Icon or (self:GetName() and _G[self:GetName() .. "Icon"]), "Frame must have a Icon");
-	(self.Icon or _G[self:GetName() .. "Icon"]):SetTexture("Interface\\ICONS\\" .. icon);
-end
-
---*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 -- Fieldsets
 --*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
@@ -587,34 +474,6 @@ function TRP3_API.ui.frame.setupFieldPanel(fieldset, text, size)
 		if _G[fieldset:GetName().."CaptionPanel"] then
 			_G[fieldset:GetName().."CaptionPanel"]:SetWidth(size or FIELDSET_DEFAULT_CAPTION_WIDTH);
 		end
-	end
-end
-
---*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
--- Editboxes
---*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-
-function TRP3_API.ui.frame.setupEditBoxesNavigation(tabEditBoxes)
-	local maxBound = # tabEditBoxes;
-	local minBound = 1;
-	for index, editbox in pairs(tabEditBoxes) do
-		editbox:SetScript("OnTabPressed", function(self, button)
-			local cursor = index
-			if shiftDown() then
-				if cursor == minBound then
-					cursor = maxBound
-				else
-					cursor = cursor -1
-				end
-			else
-				if cursor == maxBound then
-					cursor = minBound
-				else
-					cursor = cursor + 1
-				end
-			end			
-			tabEditBoxes[cursor]:SetFocus();		
-		end)
 	end
 end
 
@@ -725,90 +584,6 @@ function TRP3_API.ui.frame.createTabPanel(tabBar, data, callback, confirmCallbac
 	tabGroup:Redraw();
 
 	return tabGroup;
-end
-
---*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
--- Textures tools
---*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-
-local unitTexture = {
-	Human = {
-		"Achievement_Character_Human_Male",
-		"Achievement_Character_Human_Female",
-	},
-	Gnome = {
-		"Achievement_Character_Gnome_Male",
-		"Achievement_Character_Gnome_Female",
-	},
-	Scourge = {
-		"Achievement_Character_Undead_Male",
-		"Achievement_Character_Undead_Female",
-	},
-	NightElf = {
-		"Achievement_Character_Nightelf_Male",
-		"Achievement_Character_Nightelf_Female",
-	},
-	Dwarf = {
-		"Achievement_Character_Dwarf_Male",
-		"Achievement_Character_Dwarf_Female",
-	},
-	Draenei = {
-		"Achievement_Character_Draenei_Male",
-		"Achievement_Character_Draenei_Female",
-	},
-	Orc = {
-		"Achievement_Character_Orc_Male",
-		"Achievement_Character_Orc_Female",
-	},
-	BloodElf = {
-		"Achievement_Character_Bloodelf_Male",
-		"Achievement_Character_Bloodelf_Female",
-	},
-	Troll = {
-		"Achievement_Character_Troll_Male",
-		"Achievement_Character_Troll_Female",
-	},
-	Tauren = {
-		"Achievement_Character_Tauren_Male",
-		"Achievement_Character_Tauren_Female",
-	},
-	Worgen = {
-		"achievement_worganhead",
-		"Ability_Racial_Viciousness",
-	},
-	Goblin = {
-		"Ability_Racial_RocketJump",
-		"Ability_Racial_RocketJump",
-	},
-	Pandaren = {
-		"Achievement_Guild_ClassyPanda",
-		"Achievement_Character_Pandaren_Female",
-	},
-};
-
-local classTexture = {
-	ROGUE = "Ability_Rogue_DualWeild",
-	WARLOCK = "Ability_Warlock_Eradication",
-	PALADIN = "Spell_Paladin_Clarityofpurpose",
-	MONK = "Monk_Ability_Transcendence",
-	MAGE = "spell_Mage_NetherTempest",
-	HUNTER = "Ability_Hunter_MasterMarksman",
-	WARRIOR = "Ability_Warrior_OffensiveStance",
-	DEATHKNIGHT = "Spell_Deathknight_FrostPresence",
-	DRUID = "Spell_druid_tirelesspursuit",
-	SHAMAN = "Ability_Shaman_WindwalkTotem",
-	PRIEST = "Priest_icon_Chakra",
-}
-
-TRP3_API.ui.misc.getUnitTexture = function(race, gender)
-	if unitTexture[race] and unitTexture[race][gender - 1] then
-		return unitTexture[race][gender - 1];
-	end
-	return globals.icons.default;
-end
-
-TRP3_API.ui.misc.getClassTexture = function (class)
-	return classTexture[class] or globals.icons.default;
 end
 
 --*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -933,180 +708,4 @@ function TRP3_API.ui.text.setupToolbar(toolbar, textFrame, parentFrame, point, p
 			{function(image) onImageTagSelected(image, textFrame) end});
 	end);
 	toolbar.link:SetScript("OnClick", function() onLinkTagClicked(textFrame) end);
-end
-
---*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
--- Sounds
---*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-
-local PlaySoundFile = PlaySoundFile;
---- Patch 7.3 compatibility preparation
-local PlaySound = PlaySound;
-
-if select(4, GetBuildInfo()) == 70300 then
-	-- 7.3 uses IDs instead of sound strings. This table is mapping the IDs we need to use instead
-	local FILE_IDS_TO_OLD_PATHS = {
-		["QUESTLOGOPEN"] = 844, -- SOUNDKIT.IG_QUEST_LOG_OPEN
-		["QUESTLOGCLOSE"] = 845, -- SOUNDKIT.IG_QUEST_LOG_CLOSE
-		["igMainMenuOptionCheckBoxOn"] = 856, -- SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON
-		["gsCharacterSelection"] = 856, -- SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON (this one no longer exists)
-		["igCharacterInfoTab"] = 841, -- SOUNDKIT.IG_CHARACTER_INFO_TAB (this one no longer exists)
-		["UChatScrollButton"] = 1115, -- SOUNDKIT.U_CHAT_SCROLL_BUTTON
-		["AchievementMenuClose"] = 13833, -- SOUNDKIT.ACHIEVEMENT_MENU_CLOSE
-		["AchievementMenuOpen"] = 13832, -- SOUNDKIT.ACHIEVEMENT_MENU_OPEN
-		["GAMEDIALOGCLOSE"] = 850, -- SOUNDKIT.IG_MAINMENU_OPEN
-		["GAMEDIALOGOPEN"] = 851, -- SOUNDKIT.IG_MAINMENU_CLOSE
-	}
-
-	local oldPlaySound = PlaySound;
-	PlaySound = function(sound)
-		oldPlaySound(FILE_IDS_TO_OLD_PATHS[sound] or sound);
-	end
-end
-
-function TRP3_API.ui.misc.playUISound(pathToSound, url)
-	if getConfigValue and getConfigValue(CONFIG_UI_SOUNDS) then
-		if url then
-			PlaySoundFile(pathToSound, "SFX");
-		else
-			PlaySound(pathToSound,"SFX");
-		end
-	end
-end
-
---*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
--- Animation
---*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-
-local function playAnimation(animationGroup, callback)
-	if getConfigValue and getConfigValue(CONFIG_UI_ANIMATIONS) and animationGroup then
-		animationGroup:Stop();
-		animationGroup:Play();
-		if callback then
-			animationGroup:SetScript("OnFinished", callback)
-		end
-	elseif callback then
-		callback();
-	end
-end
-TRP3_API.ui.misc.playAnimation = playAnimation;
-
---*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
--- Hovered frames
---*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-
-function TRP3_API.ui.frame.configureHoverFrame(frame, hoveredFrame, arrowPosition, x, y, noStrataChange, parent)
-	x = x or 0;
-	y = y or 0;
-	frame:ClearAllPoints();
-	if not noStrataChange then
-		frame:SetParent(parent or hoveredFrame:GetParent());
-		frame:SetFrameStrata("HIGH");
-	else
-		frame:SetParent(parent or hoveredFrame);
-		frame:Raise();
-	end
-	frame.ArrowRIGHT:Hide();
-	frame.ArrowUP:Hide();
-	frame.ArrowDOWN:Hide();
-	frame.ArrowLEFT:Hide();
-
-	local animation;
-
-	if arrowPosition == "RIGHT" then
-		frame:SetPoint("RIGHT", hoveredFrame, "LEFT", -10 + x, 0 + y);
-		frame.ArrowLEFT:Show();
-		animation = "showAnimationFromRight";
-	elseif arrowPosition == "LEFT" then
-		frame:SetPoint("LEFT", hoveredFrame, "RIGHT", 10 + x, 0 + y);
-		frame.ArrowRIGHT:Show();
-		animation = "showAnimationFromLeft";
-	elseif arrowPosition == "TOP" then
-		frame:SetPoint("TOP", hoveredFrame, "BOTTOM", 0 + x, -20 + y);
-		frame.ArrowDOWN:Show();
-		animation = "showAnimationFromTop";
-	elseif arrowPosition == "BOTTOM" then
-		frame:SetPoint("BOTTOM", hoveredFrame, "TOP", 0 + x, 20 + y);
-		frame.ArrowUP:Show();
-		animation = "showAnimationFromBottom";
-	else
-		frame:SetPoint("CENTER", hoveredFrame, "CENTER", 0 + x, 0 + y);
-	end
-
-	frame:Show();
-	playAnimation(frame[animation]);
-end
-
---*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
--- Resize button
---*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-
-local resizeShadowFrame = TRP3_ResizeShadowFrame;
-
-function TRP3_API.ui.frame.initResize(resizeButton)
-	resizeButton.resizableFrame = resizeButton.resizableFrame or resizeButton:GetParent();
-	assert(resizeButton.minWidth, "minWidth key is not set.");
-	assert(resizeButton.minHeight, "minHeight key is not set.");
-	TRP3_API.ui.tooltip.setTooltipAll(resizeButton, "BOTTOMLEFT", 0, 0, loc("CM_RESIZE"), loc("CM_RESIZE_TT"));
-	local parentFrame = resizeButton.resizableFrame;
-	resizeButton:RegisterForDrag("LeftButton");
-	resizeButton:SetScript("OnDragStart", function(self)
-		if not self.onResizeStart or not self.onResizeStart() then
-			resizeShadowFrame.minWidth = self.minWidth;
-			resizeShadowFrame.minHeight = self.minHeight;
-			resizeShadowFrame:ClearAllPoints();
-			resizeShadowFrame:SetPoint("CENTER", self.resizableFrame, "CENTER", 0, 0);
-			resizeShadowFrame:SetWidth(parentFrame:GetWidth());
-			resizeShadowFrame:SetHeight(parentFrame:GetHeight());
-			resizeShadowFrame:Show();
-			resizeShadowFrame:StartSizing();
-			parentFrame.isSizing = true;
-		end
-	end);
-	resizeButton:SetScript("OnDragStop", function(self)
-		if parentFrame.isSizing then
-			resizeShadowFrame:StopMovingOrSizing();
-			parentFrame.isSizing = false;
-			local height, width = resizeShadowFrame:GetHeight(), resizeShadowFrame:GetWidth()
-			resizeShadowFrame:Hide();
-			if height < self.minHeight then
-				height = self.minHeight;
-			end
-			if width < self.minWidth then
-				width = self.minWidth;
-			end
-			parentFrame:SetSize(width, height);
-			if self.onResizeStop then
-				C_Timer.After(0.1, function()
-					self.onResizeStop(width, height);
-				end);
-			end
-		end
-	end);
-end
-
-resizeShadowFrame:SetScript("OnUpdate", function(self)
-	local height, width = self:GetHeight(), self:GetWidth();
-	local heightColor, widthColor = "|cff00ff00", "|cff00ff00";
-	if height < self.minHeight then
-		heightColor = "|cffff0000";
-	end
-	if width < self.minWidth then
-		widthColor = "|cffff0000";
-	end
-	resizeShadowFrame.text:SetText(widthColor .. math.ceil(width) .. "|r x " .. heightColor .. math.ceil(height));
-end);
-
---*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
--- Move frame
---*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-
-function TRP3_API.ui.frame.setupMove(frame)
-	frame:RegisterForDrag("LeftButton");
-	frame:SetScript("OnDragStart", function(self)
-		self:StartMoving();
-	end);
-	frame:SetScript("OnDragStop", function(self)
-		self:StopMovingOrSizing();
-	end)
 end

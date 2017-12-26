@@ -49,7 +49,12 @@ function Assertions.isType(variable, expectedType, variableName)
 	local variableType = type(variable);
 	local isOfExpectedType = variableType == expectedType;
 	if not isOfExpectedType then
-		return false, format(DEBUG_WRONG_PARAM_TYPE, variableName, variableType, expectedType);
+		-- Special check for frames. If a variable is a table, it could be a Frame.
+		if variableType == "table" and type(variable.IsObjectType) == "function" and variable:IsObjectType(expectedType) then
+			return true;
+		else
+			return false, format(DEBUG_WRONG_PARAM_TYPE, variableName, variableType, expectedType);
+		end
 	else
 		return true;
 	end
@@ -63,9 +68,15 @@ end
 function Assertions.isOfTypes(variable, expectedTypes, variableName)
 	local variableType = type(variable);
 	local isOfExpectedType = false;
+	local isUIObject = variableType == "table" and type(variable.IsObjectType) == "function";
 
 	for _, expectedType in pairs(expectedTypes) do
-		if variableType == expectedType then
+		if isUIObject then
+			if variable:IsObjectType(expectedType) then
+				isOfExpectedType = true;
+				break;
+			end
+		elseif variableType == expectedType then
 			isOfExpectedType = true;
 			break;
 		end

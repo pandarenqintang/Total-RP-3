@@ -101,18 +101,10 @@
 					<Anchor point="TOPLEFT" x="15" y="-12"/>
 				</Anchors>
 			</Button>
-			<Frame name="$parentBkg" inherits="UIDropDownMenuTemplate" enableMouse="true">
+			<Frame name="$parentBkg" inherits="UIDropDownMenuTemplate, TRP3_MainTooltipMouseOverScripts" enableMouse="true">
 		        <Anchors>
 					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentIcon" x="-20" y="-5"/>
 				</Anchors>
-				<Scripts>
-					<OnEnter>
-						TRP3_RefreshTooltipForFrame(self);
-					</OnEnter>
-					<OnLeave>
-						TRP3_MainTooltip:Hide();
-					</OnLeave>
-				</Scripts>
 		    </Frame>
 		    <Frame name="$parentText" inherits="TRP3_TextArea">
 				<Anchors>

@@ -20,7 +20,7 @@
 -->	
 	
 	<!-- Music browser line  -->
-	<Button name="TRP3_MusicBrowserLine" virtual="true">
+	<Button name="TRP3_MusicBrowserLine" inherits="TRP3_MainTooltipMouseOverScripts" virtual="true">
 		<Backdrop edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
 			<EdgeSize>
 				<AbsValue val="16"/>
@@ -68,11 +68,9 @@
 				self:RegisterForClicks("LeftButtonUp", "RightButtonUp");
 			</OnLoad>
 			<OnEnter>
-				TRP3_RefreshTooltipForFrame(self);
 				_G[self:GetName().."Highlight"]:Show();
 			</OnEnter>
 			<OnLeave>
-				TRP3_MainTooltip:Hide();
 				_G[self:GetName().."Highlight"]:Hide();
 			</OnLeave>
 		</Scripts>

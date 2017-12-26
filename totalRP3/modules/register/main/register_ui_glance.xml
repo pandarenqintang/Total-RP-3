@@ -17,7 +17,7 @@
 	limitations under the License.
 -->
 
-	<Button name="TRP3_GlanceBarSlotTemplate" virtual="true">
+	<Button name="TRP3_GlanceBarSlotTemplate" inherits="TRP3_MainTooltipMouseOverScripts" virtual="true">
 		<Size x="20" y="20" />
 		<Layers>
 			<Layer level="OVERLAY">
@@ -31,14 +31,6 @@
 		</Layers>
 		<NormalTexture name="$parentImage" file="Interface\TargetingFrame\UI-TargetingFrame-Seal.blp" />
 		<HighlightTexture file="Interface\Minimap\UI-Minimap-ZoomButton-Highlight" alphaMode="ADD" />
-		<Scripts>
-			<OnEnter>
-				TRP3_RefreshTooltipForFrame(self);
-			</OnEnter>
-			<OnLeave>
-				TRP3_MainTooltip:Hide();
-			</OnLeave>
-		</Scripts>
 	</Button>
 
 	<Frame name="TRP3_GlanceBarTemplate" hidden="true" frameStrata="MEDIUM" toplevel="true" enableMouse="true" virtual="true">

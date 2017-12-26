@@ -87,33 +87,17 @@
 			</Layer>
 		</Layers>
 		<Frames>
-			<Button name="TRP3_ConfigurationLocalizatorReset" inherits="UIPanelButtonTemplate">
+			<Button name="TRP3_ConfigurationLocalizatorReset" inherits="UIPanelButtonTemplate, TRP3_MainTooltipMouseOverScripts">
 				<Size x="100" y="20"/>
 				<Anchors>
 					<Anchor point="TOPRIGHT" x="-50" y="-25"/>
 				</Anchors>
-				<Scripts>
-					<OnEnter>
-						TRP3_RefreshTooltipForFrame(self);
-					</OnEnter>
-					<OnLeave>
-						TRP3_MainTooltip:Hide();
-					</OnLeave>
-				</Scripts>
 			</Button>
-			<Button name="TRP3_ConfigurationLocalizatorApply" inherits="UIPanelButtonTemplate">
+			<Button name="TRP3_ConfigurationLocalizatorApply" inherits="UIPanelButtonTemplate, TRP3_MainTooltipMouseOverScripts">
 				<Size x="100" y="20"/>
 				<Anchors>
 					<Anchor point="TOPRIGHT" relativePoint="TOPLEFT" relativeTo="TRP3_ConfigurationLocalizatorReset" x="-20" y="0"/>
 				</Anchors>
-				<Scripts>
-					<OnEnter>
-						TRP3_RefreshTooltipForFrame(self);
-					</OnEnter>
-					<OnLeave>
-						TRP3_MainTooltip:Hide();
-					</OnLeave>
-				</Scripts>
 			</Button>
 		    <Frame name="TRP3_ConfigurationLocalizatorContainer">
 		        <Backdrop bgFile="Interface\TutorialFrame\TutorialFrameBackground" edgeFile="Interface\GLUES\COMMON\TextPanel-Border" tile="true">

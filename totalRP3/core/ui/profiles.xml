@@ -18,7 +18,7 @@
 -->
 
 	<!-- Profile manager : Line -->
-	<Frame name="TRP3_ProfileManagerLine" virtual="true">
+	<Frame name="TRP3_ProfileManagerLine" inherits="TRP3_MainTooltipMouseOverScripts" virtual="true">
 		<Backdrop bgFile="Interface\TutorialFrame\TutorialFrameBackground" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
 			<EdgeSize val="16" />
 			<TileSize val="418" />
@@ -39,7 +39,7 @@
 				</Anchors>
 				<Scripts>
 					<PostClick>
-						TRP3_API.ui.misc.playUISound("gsCharacterSelection");
+						TRP3_API.ui.misc.playUISound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
 					</PostClick>
 				</Scripts>
 			</Button>
@@ -67,11 +67,9 @@
 		</Frames>
 		<Scripts>
 			<OnEnter>
-				TRP3_RefreshTooltipForFrame(self);
 				_G[self:GetName().."Highlight"]:Show();
 			</OnEnter>
 			<OnLeave>
-				TRP3_MainTooltip:Hide();
 				_G[self:GetName().."Highlight"]:Hide();
 			</OnLeave>
 		</Scripts>

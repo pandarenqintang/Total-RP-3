@@ -20,18 +20,10 @@
 -->
 	
 	<!-- Common icon button  -->
-	<Button name="TRP3_MapHereButton" virtual="true">
+	<Button name="TRP3_MapHereButton" inherits="TRP3_MainTooltipMouseOverScripts" virtual="true">
 		<Size x="16" y="16"/>
 	    <NormalTexture file="Interface\Buttons\UI-HomeButton"/>
 	    <HighlightTexture alphaMode="ADD" file="Interface\Buttons\UI-Quickslot-Depress"/>
-		<Scripts>
-			<OnEnter>
-				TRP3_RefreshTooltipForFrame(self);
-			</OnEnter>
-			<OnLeave>
-				TRP3_MainTooltip:Hide();
-			</OnLeave>
-		</Scripts>
 	</Button>
 	
 	<!-- Register characteristics register line -->

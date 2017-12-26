@@ -94,7 +94,7 @@
 							<Anchor point="BOTTOM" x="0" y="10"/>
 						</Anchors>
 					</EditBox>
-					<Button name="TRP3_CompanionBrowserFilterHelp" inherits="TRP3_HelpButton">
+					<Button name="TRP3_CompanionBrowserFilterHelp" inherits="TRP3_HelpButton, TRP3_MainTooltipMouseOverScripts">
 						<Anchors>
 							<Anchor point="TOPRIGHT" x="-10" y="-10"/>
 						</Anchors>
@@ -119,7 +119,6 @@
 							<OnEnter>
 								TRP3_CompanionBrowserFilterHelpBlinkAnimate:Stop();
 								self.animationShown = true;
-								TRP3_RefreshTooltipForFrame(self);
 							</OnEnter>
 							<OnLoad>
 								self.animationShown = false;

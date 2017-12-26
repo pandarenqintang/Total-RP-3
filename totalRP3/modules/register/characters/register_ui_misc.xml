@@ -41,18 +41,10 @@
 			</Layer>
 		</Layers>
 		<Frames>
-			<Frame name="$parentValues" inherits="UIDropDownMenuTemplate" enableMouse="true">
+			<Frame name="$parentValues" inherits="UIDropDownMenuTemplate, TRP3_MainTooltipMouseOverScripts" enableMouse="true">
 				<Anchors>
 					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentFieldName" x="0" y="0"/>
 				</Anchors>
-				<Scripts>
-					<OnEnter>
-						TRP3_RefreshTooltipForFrame(self);
-					</OnEnter>
-					<OnLeave>
-						TRP3_MainTooltip:Hide();
-					</OnLeave>
-				</Scripts>
 			</Frame>
 		</Frames>
 	</Frame>
@@ -70,7 +62,7 @@
 				TRP3_MainTooltip:Hide();
 			</OnLeave>
 			<PostClick>
-				TRP3_API.ui.misc.playUISound("gsCharacterSelection");
+				TRP3_API.ui.misc.playUISound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
 			</PostClick>
 		</Scripts>
 	</Button>
@@ -299,7 +291,7 @@
 						self:GetParent():Hide();
 					</OnClick>
 					<PostClick>
-						TRP3_API.ui.misc.playUISound("gsCharacterSelection");
+						TRP3_API.ui.misc.playUISound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
 					</PostClick>
 				</Scripts>
 			</Button>
