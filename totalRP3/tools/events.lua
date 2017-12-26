@@ -1,7 +1,7 @@
 ----------------------------------------------------------------------------------
 --- Total RP 3
 ---
---- Events system
+--- Game events system
 ---
 --- Provides an easy way to listen to game events
 ---
@@ -25,8 +25,8 @@
 ---@type TRP3_API
 local _, TRP3_API = ...;
 
-local Events = {};
-TRP3_API.Events = Events;
+local GameEvents = {};
+TRP3_API.GameEvents = GameEvents;
 
 -- WoW imports
 local assert = assert;
@@ -55,7 +55,7 @@ local EventFrame = CreateFrame("FRAME");
 ---Register a callback for a game event
 ---@param event string @ A game event to listen to
 ---@param callback func @ A callback that will be called when the event is fired with its arguments
-function Events.registerHandler(event, callback)
+function GameEvents.registerHandler(event, callback)
 	assert(isNotNil(event, "event"));
 	assert(isType(callback,"function", "callback"));
 
@@ -75,7 +75,7 @@ end
 
 ---Unregister a previously registered callback using the handler ID given at registration
 ---@param handlerID string @ The handler ID of a previsouly registered callback that we want to unregister
-function Events.unregisterHandler(handlerID)
+function GameEvents.unregisterHandler(handlerID)
 	assert(isNotNil(handlerID, "handlerID"));
 
 	-- Look for the handler ID through all the events
@@ -118,6 +118,6 @@ end
 
 EventFrame:SetScript("OnEvent", eventDispatcher);
 
-function Events.fireEvent(event, ...)
+function GameEvents.fireEvent(event, ...)
 	eventDispatcher(EventFrame, event, ...)
 end

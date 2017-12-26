@@ -183,3 +183,10 @@ end
 function Sounds.getTitle(musicURL)
 	return type(musicURL) == "number" and musicURL or musicURL:match("[%\\]?([^%\\]+)$");
 end
+
+function Sounds.playUISound(soundID, channel)
+	if TRP3_API.Configuration.getValue(TRP3_API.Configuration.KEYS.UI_SOUNDS) then
+		local willPlay, handlerID = PlaySound(soundID, channel or Sounds.CHANNELS.SFX);
+		return handlerID;
+	end
+end

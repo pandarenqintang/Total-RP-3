@@ -17,14 +17,12 @@
 --	limitations under the License.
 ----------------------------------------------------------------------------------
 
-TRP3_API.ui = {
-	tooltip = {},
-	listbox = {},
-	list = {},
-	misc = {},
-	frame = {},
-	text = {}
-}
+TRP3_API.ui.tooltip = {};
+TRP3_API.ui.listbox = {};
+TRP3_API.ui.list = {};
+TRP3_API.ui.misc = {};
+TRP3_API.ui.frame = {};
+TRP3_API.ui.text = {};
 
 -- imports
 local globals = TRP3_API.globals;
@@ -973,13 +971,6 @@ function TRP3_API.ui.misc.playUISound(pathToSound, url)
 		else
 			PlaySound(pathToSound,"SFX");
 		end
-	end
-end
-
-function TRP3_API.ui.misc.playSoundKit(soundID, channel)
-	if getConfigValue and getConfigValue(CONFIG_UI_SOUNDS) then
-		local willPlay, handlerID = PlaySound(soundID, channel or "SFX");
-		return handlerID;
 	end
 end
 

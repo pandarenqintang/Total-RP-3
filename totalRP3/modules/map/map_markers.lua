@@ -1,39 +1,52 @@
 ----------------------------------------------------------------------------------
--- Total RP 3
--- Map marker and coordinates system
---	---------------------------------------------------------------------------
---	Copyright 2014 Sylvain Cossement (telkostrasz@telkostrasz.be)
---
---	Licensed under the Apache License, Version 2.0 (the "License");
---	you may not use this file except in compliance with the License.
---	You may obtain a copy of the License at
---
---		http://www.apache.org/licenses/LICENSE-2.0
---
---	Unless required by applicable law or agreed to in writing, software
---	distributed under the License is distributed on an "AS IS" BASIS,
---	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
---	See the License for the specific language governing permissions and
---	limitations under the License.
+--- Total RP 3
+--- Map marker and coordinates system
+---	---------------------------------------------------------------------------
+---	Copyright 2014 Sylvain Cossement (telkostrasz@telkostrasz.be)
+--- Copyright 2017 Renaud "Ellypse" Parize <ellypse@totalrp3.info> @EllypseCelwe
+---
+---	Licensed under the Apache License, Version 2.0 (the "License");
+---	you may not use this file except in compliance with the License.
+---	You may obtain a copy of the License at
+---
+---		http://www.apache.org/licenses/LICENSE-2.0
+---
+---	Unless required by applicable law or agreed to in writing, software
+---	distributed under the License is distributed on an "AS IS" BASIS,
+---	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+---	See the License for the specific language governing permissions and
+---	limitations under the License.
 ----------------------------------------------------------------------------------
+
+---@type TRP3_API
+local _, TRP3_API = ...;
 
 TRP3_API.map = {};
 
-local Utils, Events, Globals = TRP3_API.utils, TRP3_API.events, TRP3_API.globals;
-local Comm = TRP3_API.communication;
-local setupIconButton = TRP3_API.ui.frame.setupIconButton;
-local displayDropDown = TRP3_API.ui.listbox.displayDropDown;
-local loc = TRP3_API.locale.getText;
+local MapMarkers = {};
+TRP3_API.MapMarkers = MapMarkers;
+
+-- WoW imports
 local tinsert, assert, tonumber, pairs, _G, wipe = tinsert, assert, tonumber, pairs, _G, wipe;
 local CreateFrame = CreateFrame;
 local after = C_Timer.After;
-local playAnimation = TRP3_API.ui.misc.playAnimation;
-local getConfigValue = TRP3_API.configuration.getValue;
 
-local CONFIG_UI_ANIMATIONS = "ui_animations";
+-- Total RP 3 imports
+local Textures = TRP3_API.Textures;
+local GameEvents = TRP3_API.GameEvents;
+local Events = TRP3_API.Events;
+local Configuration = TRP3_API.Configuration;
+local loc = TRP3_API.loc;
+
+local Comm = TRP3_API.communication;
+local setupIconButton = TRP3_API.ui.frame.setupIconButton;
+local displayDropDown = TRP3_API.ui.listbox.displayDropDown;
+local playAnimation = TRP3_API.ui.misc.playAnimation;
 
 ---@type Frame
 local TRP3_ScanLoaderFrame = TRP3_ScanLoaderFrame;
+
+Configuration.KEYS.MAP_BUTTON_POSITION = "MAP_BUTTON_POSITION";
 
 --*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 -- Marker logic
@@ -101,7 +114,7 @@ local function placeMarker(marker, x, y)
 end
 
 local function animateMarker(marker, x, y, directAnimation)
-	if getConfigValue(CONFIG_UI_ANIMATIONS) then
+	if Configuration.getConfigValue(Configuration.KEYS.UI_ANIMATIONS) then
 
 		local distanceX = 0.5 - x;
 		local distanceY = 0.5 - y;
@@ -255,11 +268,12 @@ function launchScan(scanID)
 end
 TRP3_API.map.launchScan = launchScan;
 
+local DEFAULT_SCAN_ICON = "Inv_misc_enggizmos_20";
 local function onButtonClicked(self)
 	local structure = {};
 	for scanID, scanStructure in pairs(SCAN_STRUCTURES) do
 		if not scanStructure.canScan or scanStructure.canScan() == true then
-			tinsert(structure, { Utils.str.icon(scanStructure.buttonIcon or "Inv_misc_enggizmos_20", 20) .. " " .. (scanStructure.buttonText or scanID), scanID});
+			tinsert(structure, { Textures.iconTag(scanStructure.buttonIcon or DEFAULT_SCAN_ICON, 20) .. " " .. (scanStructure.buttonText or scanID), scanID});
 		end
 	end
 	if #structure == 0 then
@@ -290,11 +304,9 @@ TRP3_API.events.listenToEvent(TRP3_API.events.WORKFLOW_ON_LOAD, function()
 		self.refreshTimer = self.refreshTimer + elapsed;
 	end);
 
-	Utils.event.registerHandler("WORLD_MAP_UPDATE", onWorldMapUpdate);
+	GameEvents.registerHandler("WORLD_MAP_UPDATE", onWorldMapUpdate)
 end);
 
-local CONFIG_MAP_BUTTON_POSITION = "MAP_BUTTON_POSITION";
-local getConfigValue, registerConfigKey, setConfigValue = TRP3_API.configuration.getValue, TRP3_API.configuration.registerConfigKey, TRP3_API.configuration.setValue;
 
 ---@param position string
 local function placeMapButton(position)
@@ -322,32 +334,33 @@ local function placeMapButton(position)
 
 	worldMapButton:SetPoint(position, WorldMapFrame.UIElementsFrame, position, xPadding, yPadding);
 
-	setConfigValue(CONFIG_MAP_BUTTON_POSITION, position);
+	Configuration.setConfigValue(Configuration.KEYS.MAP_BUTTON_POSITION, position);
 end
 
-TRP3_API.events.listenToEvent(TRP3_API.events.WORKFLOW_ON_LOADED, function()
-	registerConfigKey(CONFIG_MAP_BUTTON_POSITION, "BOTTOMLEFT");
+Events.listenToEvent(Events.EVENTS.WORKFLOW_ON_LOADED, function()
 
-	tinsert(TRP3_API.configuration.CONFIG_FRAME_PAGE.elements, {
+	Configuration.registerConfigKey(Configuration.KEYS.MAP_BUTTON_POSITION, "BOTTOMLEFT");
+
+	tinsert(Configuration.CONFIG_FRAME_PAGE.elements, {
 		inherit = "TRP3_ConfigH1",
-		title = loc("CO_MAP_BUTTON"),
+		title = loc.CO_MAP_BUTTON,
 	});
 
-	tinsert(TRP3_API.configuration.CONFIG_FRAME_PAGE.elements, {
+	tinsert(Configuration.CONFIG_FRAME_PAGE.elements, {
 		inherit = "TRP3_ConfigDropDown",
 		widgetName = "TRP3_ConfigurationFrame_MapButtonWidget",
-		title = loc("CO_MAP_BUTTON_POS"),
+		title = loc.CO_MAP_BUTTON_POS,
 		listContent = {
-			{loc("CO_ANCHOR_BOTTOM_LEFT"), "BOTTOMLEFT"},
-			{loc("CO_ANCHOR_TOP_LEFT"), "TOPLEFT"},
-			{loc("CO_ANCHOR_BOTTOM_RIGHT"), "BOTTOMRIGHT"},
-			{loc("CO_ANCHOR_TOP_RIGHT"), "TOPRIGHT"}
+			{loc.CO_ANCHOR_BOTTOM_LEFT, "BOTTOMLEFT"},
+			{loc.CO_ANCHOR_TOP_LEFT, "TOPLEFT"},
+			{loc.CO_ANCHOR_BOTTOM_RIGHT, "BOTTOMRIGHT"},
+			{loc.CO_ANCHOR_TOP_RIGHT, "TOPRIGHT"}
 		},
 		listCallback = placeMapButton,
 		listCancel = true,
-		configKey = CONFIG_MAP_BUTTON_POSITION,
+		configKey = Configuration.KEYS.MAP_BUTTON_POSITION,
 	});
 
-	placeMapButton(getConfigValue(CONFIG_MAP_BUTTON_POSITION));
+	placeMapButton(Configuration.getConfigValue(Configuration.KEYS.MAP_BUTTON_POSITION));
 
 end);

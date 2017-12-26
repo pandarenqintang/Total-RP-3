@@ -1,35 +1,50 @@
 ----------------------------------------------------------------------------------
--- Total RP 3
--- Settings API
---	---------------------------------------------------------------------------
---	Copyright 2014 Sylvain Cossement (telkostrasz@telkostrasz.be)
---
---	Licensed under the Apache License, Version 2.0 (the "License");
---	you may not use this file except in compliance with the License.
---	You may obtain a copy of the License at
---
---		http://www.apache.org/licenses/LICENSE-2.0
---
---	Unless required by applicable law or agreed to in writing, software
---	distributed under the License is distributed on an "AS IS" BASIS,
---	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
---	See the License for the specific language governing permissions and
---	limitations under the License.
+--- Total RP 3
+---
+--- Settings API
+---
+---	---------------------------------------------------------------------------
+---	Copyright 2014 Sylvain Cossement (telkostrasz@telkostrasz.be)
+--- Copyright 2017 Renaud "Ellypse" Parize <ellypse@totalrp3.info> @EllypseCelwe
+---
+---	Licensed under the Apache License, Version 2.0 (the "License");
+---	you may not use this file except in compliance with the License.
+---	You may obtain a copy of the License at
+---
+---		http://www.apache.org/licenses/LICENSE-2.0
+---
+---	Unless required by applicable law or agreed to in writing, software
+---	distributed under the License is distributed on an "AS IS" BASIS,
+---	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+---	See the License for the specific language governing permissions and
+---	limitations under the License.
 ----------------------------------------------------------------------------------
 
+---@type TRP3_API
+local _, TRP3_API = ...;
+
 -- public accessor
-TRP3_API.configuration = {};
+local Configuration = {};
+TRP3_API.Configuration = Configuration;
 
 -- imports
-local loc = TRP3_API.locale.getText;
-local Utils = TRP3_API.utils;
-local Config = TRP3_API.configuration;
-local _G, tonumber, math, tinsert, type, assert, tostring, pairs, sort, strconcat = _G, tonumber, math, tinsert, type, assert, tostring, pairs, table.sort, strconcat;
-local numberToHexa, hexaToNumber = Utils.color.numberToHexa, Utils.color.hexaToNumber;
+local tonumber = tonumber;
+local math = math;
+local tinsert = tinsert;
+local type = type;
+local assert = assert;
+local tostring = tostring;
+local pairs = pairs;
+local sort = sort;
+local strconcat = strconcat;
 local CreateFrame = CreateFrame;
-local getLocaleText = TRP3_API.locale.getLocaleText;
-local getLocales = TRP3_API.locale.getLocales;
-local getCurrentLocale = TRP3_API.locale.getCurrentLocale;
+
+-- Total RP 3 imports
+local isType = TRP3_API.Assertions.isType;
+local Events = TRP3_API.Events;
+local loc = TRP3_API.loc;
+local Colors = TRP3_API.Colors;
+local Locale = TRP3_API.Locale;
 local setTooltipForFrame = TRP3_API.ui.tooltip.setTooltipForSameFrame;
 local setupListBox = TRP3_API.ui.listbox.setupListBox;
 local registerMenu, selectMenu = TRP3_API.navigation.menu.registerMenu, TRP3_API.navigation.menu.selectMenu;
@@ -39,6 +54,18 @@ local registerPage, setPage = TRP3_API.navigation.page.registerPage, TRP3_API.na
 -- Configuration methods
 --*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
+Configuration.KEYS = {
+	ADDON_LOCALE = "AddonLocale",
+	HEAVY_PROFILE_ALERT = "heavy_profile_alert",
+	NEW_VERSION_ALERT = "new_version_alert",
+	UI_SOUNDS = "ui_sounds",
+	UI_ANIMATIONS = "ui_animations",
+
+	-- TODO We should remove these options. It leads to bad bug reports
+	USE_BROADCAST_CHANNEL = "comm_broad_use",
+	BROADCAST_CHANNEL_NAME = "comm_broad_chan",
+}
+
 if TRP3_Configuration == nil then
 	TRP3_Configuration = {};
 end
@@ -47,6 +74,8 @@ local defaultValues = {};
 local configHandlers = {};
 
 local function registerHandler(key, callback)
+	assert(isType(key, "string", "key"));
+	assert(isType(callback, "function", "callback"));
 	assert(defaultValues[key] ~= nil, "Unknown config key: " .. tostring(key));
 	if not configHandlers[key] then
 		configHandlers[key] = {};
@@ -54,7 +83,10 @@ local function registerHandler(key, callback)
 	tinsert(configHandlers[key], callback);
 end
 
-Config.registerHandler =  function (key, callback)
+--- Register a callback that will be called every time a configuration value is changed
+---@param key string @ A configuration key to observe
+---@param callback func @ A callback that will be run every time the configuration is changed
+function Configuration.registerHandler(key, callback)
 	if type(key) == "table" then
 		for _, k in pairs(key) do
 			registerHandler(k, callback);
@@ -64,39 +96,52 @@ Config.registerHandler =  function (key, callback)
 	end
 end
 
-local function setValue(key, value)
+---Set the value of a configuration option.
+---Will fire any callback that has been registered for this option if the value changed.
+---@param key string @ A configuration key used to identify the option
+---@param value any @ The value that should be saved in the settings for this configuration
+function Configuration.setValue(key, value)
+	assert(isType(key, "string", "key"));
 	assert(defaultValues[key] ~= nil, "Unknown config key: " .. tostring(key));
 	local old = TRP3_Configuration[key];
 	TRP3_Configuration[key] = value;
+
+	-- Only call the callbacks if the value changed
 	if configHandlers[key] and old ~= value then
 		for _, callback in pairs(configHandlers[key]) do
 			callback(key, value);
 		end
 	end
 end
-Config.setValue = setValue;
 
-local function getValue(key)
+---Get the value for the configuration option corresponding to the given key
+---@param key string @ A configuration key
+---@return any keyValue @ The value for the configuration key stored
+function Configuration.getValue(key)
+	assert(isType(key, "string", "key"));
 	assert(defaultValues[key] ~= nil, "Unknown config key: " .. tostring(key));
 	return TRP3_Configuration[key];
 end
-Config.getValue = getValue;
 
-local function registerConfigKey(key, defaultValue)
-	assert(type(key) == "string" and defaultValue ~= nil, "Must be a string key and a not nil default value.");
+---Register a new configuration key with the given default value
+---@param key string @ A configuration key to register
+---@param defaultValue any @ The default value for this key
+function Configuration.registerConfigKey(key, defaultValue)
+	assert(isType(key, "string", "key"));
 	assert(not defaultValues[key], "Config key already registered: " .. tostring(key));
 	defaultValues[key] = defaultValue;
 	if TRP3_Configuration[key] == nil then
-		setValue(key, defaultValue);
+		Configuration.setValue(key, defaultValue);
 	end
 end
-Config.registerConfigKey = registerConfigKey;
 
-local function resetValue(key)
+---Restore the default value for a configuration key
+---@param key string @ A configuration key to reset
+function Configuration.resetValue(key)
+	assert(isType(key, "string", "key"));
 	assert(defaultValues[key] ~= nil, "Unknown config key: " .. tostring(key));
-	setValue(key, defaultValues[key]);
+	Configuration.setValue(key, defaultValues[key]);
 end
-Config.resetValue = resetValue;
 
 --*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 -- Configuration builder
@@ -107,9 +152,12 @@ local optionsDependentOnOtherOptions = {};
 
 local function buildConfigurationPage(structure)
 	local optionsDependency = {};
+	---@type Frame
 	local lastWidget;
 	local marginLeft = structure.marginLeft or 5;
+
 	for index, element in pairs(structure.elements) do
+		---@type Frame
 		local widget = element.widget or CreateFrame("Frame", element.widgetName or ("TRP3_ConfigurationWidget"..GENERATED_WIDGET_INDEX), structure.parent, element.inherit);
 		widget:ClearAllPoints();
 		widget:SetPoint("LEFT", structure.parent, "LEFT", marginLeft + (element.marginLeft or 5), 0);
@@ -148,7 +196,7 @@ local function buildConfigurationPage(structure)
 			if element.configKey then
 				if not element.listCallback then
 					element.listCallback = function(value)
-						setValue(element.configKey, value);
+						Configuration.setValue(element.configKey, value);
 					end
 				end
 			end
@@ -161,7 +209,7 @@ local function buildConfigurationPage(structure)
 				element.listCancel
 			);
 			if element.configKey and not element.listDefault then
-				dropDown:SetSelectedValue(getValue(element.configKey));
+				dropDown:SetSelectedValue(Configuration.getValue(element.configKey));
 			end
 		end
 
@@ -170,13 +218,13 @@ local function buildConfigurationPage(structure)
 			if element.configKey then
 				local button = _G[widget:GetName().."Picker"];
 				element.controller = button;
-				button.setColor(hexaToNumber(getValue(element.configKey)));
+				button.setColor(Colors.hexaToNumber(Configuration.getValue(element.configKey)));
 				button.onSelection = function(red, green, blue)
 					if red and green and blue then
-						local hexa = strconcat(numberToHexa(red), numberToHexa(green), numberToHexa(blue))
-						setValue(element.configKey, hexa);
+						local hexa = strconcat(Colors.numberToHexa(red), Colors.numberToHexa(green), Colors.numberToHexa(blue))
+						Configuration.setValue(element.configKey, hexa);
 					else
-						button.setColor(hexaToNumber(defaultValues[element.configKey]));
+						button.setColor(Colors.hexaToNumber(defaultValues[element.configKey]));
 					end
 				end;
 			end
@@ -199,9 +247,9 @@ local function buildConfigurationPage(structure)
 			if element.configKey then
 				box:SetScript("OnTextChanged", function(self)
 					local value = self:GetText();
-					setValue(element.configKey, value);
+					Configuration.setValue(element.configKey, value);
 				end);
-				box:SetText(tostring(getValue(element.configKey)));
+				box:SetText(tostring(Configuration.getValue(element.configKey)));
 			end
 			box:SetNumeric(element.numeric);
 			box:SetMaxLetters(element.maxLetters or 0);
@@ -218,7 +266,7 @@ local function buildConfigurationPage(structure)
 			if element.configKey then
 				box:SetScript("OnClick", function(self)
 					local optionIsEnabled = self:GetChecked();
-					setValue(element.configKey, optionIsEnabled);
+					Configuration.setValue(element.configKey, optionIsEnabled);
 					
 					if optionsDependentOnOtherOptions[element.configKey] then
 						for _, dependentOption in pairs(optionsDependentOnOtherOptions[element.configKey]) do
@@ -235,7 +283,7 @@ local function buildConfigurationPage(structure)
 						end
 					end
 				end);
-				box:SetChecked(getValue(element.configKey));
+				box:SetChecked(Configuration.getValue(element.configKey));
 			end
 		end
 
@@ -258,13 +306,13 @@ local function buildConfigurationPage(structure)
 				end
 				text:SetText(value);
 				if element.configKey then
-					setValue(element.configKey, value);
+					Configuration.setValue(element.configKey, value);
 				end
 			end
 			slider:SetScript("OnValueChanged", onChange);
 
 			if element.configKey then
-				slider:SetValue(tonumber(getValue(element.configKey)) or min);
+				slider:SetValue(tonumber(Configuration.getValue(element.configKey)) or min);
 			else
 				slider:SetValue(0);
 			end
@@ -293,8 +341,8 @@ local function buildConfigurationPage(structure)
 		-- Go through each element of the dependence
 		for _, element in pairs(dependentElements) do
 			
-			-- If the option is disable we render the element as being disable
-			if not getValue(dependence) then
+			-- If the option is disabled we render the dependent element as being disabled
+			if not Configuration.getValue(dependence) then
 				element.widget:SetAlpha(0.5);
 				
 				if element.controller then
@@ -315,7 +363,9 @@ end
 local configurationPageCount = 0;
 local registeredConfiPage = {};
 
-local function registerConfigurationPage(pageStructure)
+---@param pageStructure table @ A configuration page structure
+--- TODO Document this better
+function Configuration.registerConfigurationPage(pageStructure)
 	assert(not registeredConfiPage[pageStructure.id], "Already registered page id: " .. pageStructure.id);
 	registeredConfiPage[pageStructure.id] = pageStructure;
 
@@ -339,17 +389,19 @@ local function registerConfigurationPage(pageStructure)
 
 	buildConfigurationPage(pageStructure);
 end
-Config.registerConfigurationPage = registerConfigurationPage;
 
 --*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 -- GENERAL SETTINGS
 --*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 local function changeLocale(newLocale)
-	if newLocale ~= getCurrentLocale() then
-		setValue("AddonLocale", newLocale);
-		TRP3_API.popup.showConfirmPopup(loc("CO_GENERAL_CHANGELOCALE_ALERT"):format(Utils.str.color("g")..getLocaleText(newLocale).."|r"),
-		function()
+	if newLocale ~= Locale.getCurrentLocale() then
+		Configuration.setValue(Configuration.KEYS.ADDON_LOCALE, newLocale);
+
+		local localeText = Locale.getLocaleText(newLocale);
+		localeText = Colors.COLORS.GREEN:WrapTextInColorCode(localeText);
+
+		TRP3_API.popup.showConfirmPopup(loc(loc.CO_GENERAL_CHANGELOCALE_ALERT, localeText), function()
 			ReloadUI();
 		end);
 	end
@@ -359,85 +411,85 @@ end
 -- INIT
 --*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
-TRP3_API.events.listenToEvent(TRP3_API.events.WORKFLOW_ON_LOAD, function()
+Events.listenToEvent(Events.EVENTS.WORKFLOW_ON_LOAD, function()
 
 	-- Resizing
-	TRP3_API.events.listenToEvent(TRP3_API.events.NAVIGATION_RESIZED, function(containerwidth, containerHeight)
+	Events.listenToEvent(Events.EVENTS.NAVIGATION_RESIZED, function(containerWidth, containerHeight)
 		for _, structure in pairs(registeredConfiPage) do
-			structure.parent:SetSize(containerwidth - 70, 50);
+			structure.parent:SetSize(containerWidth - 70, 50);
 		end
 	end);
 
 	-- Page and menu
 	registerMenu({
 		id = "main_90_config",
-		text = loc("CO_CONFIGURATION"),
+		text = loc.CO_CONFIGURATION,
 		onSelected = function() selectMenu("main_91_config_main_config_aaa_general") end,
 	});
 
-	TRP3_API.configuration.CONFIG_FRAME_PAGE = {
+	Configuration.CONFIG_FRAME_PAGE = {
 		id = "main_config_toolbar",
-		menuText = loc("CO_TOOLBAR"),
-		pageText = loc("CO_TOOLBAR"),
+		menuText = loc.CO_TOOLBAR,
+		pageText = loc.CO_TOOLBAR,
 		elements = {},
 	};
 	
 	-- GENERAL SETTINGS INIT
 	-- localization
 	local localeTab = {};
-	for _, locale in pairs(getLocales()) do
-		tinsert(localeTab, {getLocaleText(locale), locale});
+	for _, locale in pairs(Locale.getLocales()) do
+		tinsert(localeTab, { Locale.getLocaleText(locale), locale });
 	end
 
-	registerConfigKey("comm_broad_use", true);
-	registerConfigKey("heavy_profile_alert", true);
-	registerConfigKey("new_version_alert", true);
-	registerConfigKey("ui_sounds", true);
-	registerConfigKey("ui_animations", true);
-	registerConfigKey("comm_broad_chan", "xtensionxtooltip2");
+	Events.registerConfigKey(Configuration.KEYS.HEAVY_PROFILE_ALERT, true);
+	Events.registerConfigKey(Configuration.KEYS.NEW_VERSION_ALERT, true);
+	Events.registerConfigKey(Configuration.KEYS.UI_SOUNDS, true);
+	Events.registerConfigKey(Configuration.KEYS.UI_ANIMATIONS, true);
+	Events.registerConfigKey(Configuration.KEYS.USE_BROADCAST_CHANNEL, true);
+	Events.registerConfigKey(Configuration.KEYS.BROADCAST_CHANNEL_NAME, "xtensionxtooltip2");
 
 	-- Build widgets
-	TRP3_API.configuration.CONFIG_STRUCTURE_GENERAL = {
+	Configuration.CONFIG_STRUCTURE_GENERAL = {
 		id = "main_config_aaa_general",
-		menuText = loc("CO_GENERAL"),
-		pageText = loc("CO_GENERAL"),
+		menuText = loc.CO_GENERAL,
+		pageText = loc.CO_GENERAL,
 		elements = {
 			{
 				inherit = "TRP3_ConfigH1",
-				title = loc("CO_GENERAL_LOCALE"),
+				title = loc.CO_GENERAL_LOCALE,
 			},
 			{
 				inherit = "TRP3_ConfigDropDown",
 				widgetName = "TRP3_ConfigurationGeneral_LangWidget",
-				title = loc("CO_GENERAL_LOCALE"),
+				title = loc.CO_GENERAL_LOCALE,
 				listContent = localeTab,
 				listCallback = changeLocale,
-				listDefault = getLocaleText(getCurrentLocale()),
+				listDefault = Locale.getLocaleText(Locale.getCurrentLocale()),
 				listCancel = true,
 			},
 			{
 				inherit = "TRP3_ConfigH1",
-				title = loc("CO_GENERAL_COM"),
+				title = loc.CO_GENERAL_COM,
 			},
 			{
 				inherit = "TRP3_ConfigCheck",
-				title = loc("CO_GENERAL_BROADCAST"),
-				configKey = "comm_broad_use",
-				help = loc("CO_GENERAL_BROADCAST_TT"),
+				title = loc.CO_GENERAL_BROADCAST,
+				configKey = Configuration.KEYS.USE_BROADCAST_CHANNEL,
+				help = loc.CO_GENERAL_BROADCAST_TT,
 			},
 			{
 				inherit = "TRP3_ConfigEditBox",
-				title = loc("CO_GENERAL_BROADCAST_C"),
-				configKey = "comm_broad_chan",
-				dependentOnOptions = {"comm_broad_use"},
+				title = loc.CO_GENERAL_BROADCAST_C,
+				configKey = Configuration.KEYS.BROADCAST_CHANNEL_NAME,
+				dependentOnOptions = { Configuration.KEYS.USE_BROADCAST_CHANNEL },
 			},
 			{
 				inherit = "TRP3_ConfigH1",
-				title = loc("CO_GENERAL_MISC"),
+				title = loc.CO_GENERAL_MISC,
 			},
 			{
 				inherit = "TRP3_ConfigSlider",
-				title = loc("CO_GENERAL_TT_SIZE"),
+				title = loc.CO_GENERAL_TT_SIZE,
 				configKey = TRP3_API.ui.tooltip.CONFIG_TOOLTIP_SIZE,
 				min = 6,
 				max = 25,
@@ -446,33 +498,33 @@ TRP3_API.events.listenToEvent(TRP3_API.events.WORKFLOW_ON_LOAD, function()
 			},
 			{
 				inherit = "TRP3_ConfigCheck",
-				title = loc("CO_GENERAL_HEAVY"),
-				configKey = "heavy_profile_alert",
-				help = loc("CO_GENERAL_HEAVY_TT"),
+				title = loc.CO_GENERAL_HEAVY,
+				configKey = Configuration.KEYS.HEAVY_PROFILE_ALERT,
+				help = loc.CO_GENERAL_HEAVY_TT,
 			},
 			{
 				inherit = "TRP3_ConfigCheck",
-				title = loc("CO_GENERAL_NEW_VERSION"),
-				configKey = "new_version_alert",
-				help = loc("CO_GENERAL_NEW_VERSION_TT"),
+				title = loc.CO_GENERAL_NEW_VERSION,
+				configKey = Configuration.KEYS.NEW_VERSION_ALERT,
+				help = loc.CO_GENERAL_NEW_VERSION_TT,
 			},
 			{
 				inherit = "TRP3_ConfigCheck",
-				title = loc("CO_GENERAL_UI_SOUNDS"),
-				configKey = "ui_sounds",
-				help = loc("CO_GENERAL_UI_SOUNDS_TT"),
+				title = loc.CO_GENERAL_UI_SOUNDS,
+				configKey = Configuration.KEYS.UI_SOUNDS,
+				help = loc.CO_GENERAL_UI_SOUNDS_TT,
 			},
 			{
 				inherit = "TRP3_ConfigCheck",
-				title = loc("CO_GENERAL_UI_ANIMATIONS"),
-				configKey = "ui_animations",
-				help = loc("CO_GENERAL_UI_ANIMATIONS_TT"),
+				title = loc.CO_GENERAL_UI_ANIMATIONS,
+				configKey = Configuration.KEYS.UI_ANIMATIONS,
+				help = loc.CO_GENERAL_UI_ANIMATIONS_TT,
 			},
 		}
 	}
 end);
 
-function TRP3_API.configuration.constructConfigPage()
-	TRP3_API.configuration.registerConfigurationPage(TRP3_API.configuration.CONFIG_FRAME_PAGE);
-	TRP3_API.configuration.registerConfigurationPage(TRP3_API.configuration.CONFIG_STRUCTURE_GENERAL);
+function Configuration.constructConfigPage()
+	Configuration.registerConfigurationPage(Configuration.CONFIG_FRAME_PAGE);
+	Configuration.registerConfigurationPage(Configuration.CONFIG_STRUCTURE_GENERAL);
 end

@@ -27,7 +27,8 @@ local Map = {};
 TRP3_API.Map = Map;
 
 -- WoW imports
-local getZoneText, getSubZoneText = GetZoneText, GetSubZoneText;
+local getZoneText = GetZoneText;
+local getSubZoneText = GetSubZoneText;
 local UnitPosition = UnitPosition;
 local GetCurrentMapAreaID = GetCurrentMapAreaID;
 local GetPlayerMapPosition = GetPlayerMapPosition;

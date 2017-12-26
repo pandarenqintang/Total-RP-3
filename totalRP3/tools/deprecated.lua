@@ -74,7 +74,7 @@ end , "TRP3_API.utils.color.getUnitCustomColor", "TRP3_API.register.getUnitCusto
 TRP3_API.utils.str.color = setUpDeprecatedFunctionWarning(TRP3_API.Colors.get, "TRP3_API.utils.str.color", "TRP3_API.Colors.get");
 
 -- Events API
-TRP3_API.utils.event = setUpAPIDeprecatedWarning(TRP3_API.Events, "Events", "TRP3_API.utils.event", "TRP3_API.Events");
+TRP3_API.utils.event = setUpAPIDeprecatedWarning(TRP3_API.GameEvents, "GameEvents", "TRP3_API.utils.event", "TRP3_API.GameEvents");
 
 -- GUID API
 TRP3_API.utils.guid = setUpAPIDeprecatedWarning(TRP3_API.GUID, "GUID", "TRP3_API.utils.guid", "TRP3_API.GUID");
@@ -94,6 +94,7 @@ end
 
 -- Sounds API
 TRP3_API.utils.music = setUpAPIDeprecatedWarning(TRP3_API.Sounds, "Sounds", "TRP3_API.utils.music", "TRP3_API.Sounds");
+TRP3_API.ui.misc.playSoundKit = setUpDeprecatedFunctionWarning(TRP3_API.Sounds.playUISound, "TRP3_API.ui.misc.playSoundKit", "TRP3_API.Sounds.playUISound");
 -- Manually register a played sound callback for Extended's sound history frame
 TRP3_API.Sounds.registerOnSoundPlayedCallback(function()
 	if TRP3_SoundsHistoryFrame then
@@ -142,3 +143,16 @@ TRP3_API.utils.str.buildZoneText = setUpDeprecatedFunctionWarning(TRP3_API.Map.g
 
 TRP3_API.map = {};
 TRP3_API.map.getCurrentCoordinates = setUpDeprecatedFunctionWarning(TRP3_API.Map.getCurrentCoordinates, "TRP3_API.map.getCurrentCoordinates", "TRP3_API.Map.getCurrentCoordinates");
+
+-- TRP3 Events API
+TRP3_API.events = setUpAPIDeprecatedWarning(TRP3_API.Events, "Events", "TRP3_API.events", "TRP3_API.Events");
+-- Copy events to main table, as they used to be placed there before
+for k, v in pairs(TRP3_API.Events.EVENTS) do
+	TRP3_API.events[k] = v;
+end
+
+-- Configuration API
+TRP3_API.configuration = setUpAPIDeprecatedWarning(TRP3_API.Configuration, "Configuration", "TRP3_API.configuration", "TRP3_API.Configuration");
+
+-- Configuration API
+TRP3_API.slash = setUpAPIDeprecatedWarning(TRP3_API.Slash, "Slash", "TRP3_API.slash", "TRP3_API.Slash");
