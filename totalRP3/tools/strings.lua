@@ -38,6 +38,9 @@ local date = date;
 local tinsert = table.insert;
 local pcall = pcall;
 local strconcat = strconcat;
+local strtrim = strtrim;
+local gsub = string.gsub;
+local type = type;
 
 -- Total RP 3 imports
 local isType = TRP3_API.Assertions.isType;
@@ -168,6 +171,36 @@ function Strings.companionIDToInfo(companionID)
 	return companionID:sub(1, companionID:find('_') - 1), companionID:sub(companionID:find('_') + 1);
 end
 
+--- Check if a text is an empty string and returns nil instead
+---@param text string @ The string to check
+---@return string|nil text @ Returns nil if the given text was empty
+function Strings.emptyToNil(text)
+	if text and #text > 0 then
+		return text;
+	end
+	return nil;
+end
+
+--- Search if the string matches the pattern in error-safe way.
+--- Useful if the pattern his user written.
+---@param text string @ The string to test
+---@param pattern string @ The pattern to match
+---@return boolean|nil matched @ Returns true if the pattern was matched in the given text
+function Strings.safeMath(text, pattern)
+	local trace = {pcall(string.find, text, pattern)};
+	if trace[1] then
+		return type(trace[2]) == "number";
+	end
+	return nil; -- Pattern error
+end
+
+--- Assure that the given string will not be nil
+---@param text string|nil @ A string that could be nil
+---@return string text @ Always return a string, empty string if the given text was nil
+function Strings.nilToEmpty(text)
+	return text or "";
+end
+
 local TRP3_TAGS = {
 	END_OF_COLOR = "/col", -- {/col}
 	SINGLE_LETTER_COLOR = "^col%:(%a)$", -- {col:r}
@@ -214,4 +247,69 @@ function Strings.convertTextTags(text)
 		text = text:gsub("%{(.-)%}", convertTextTag);
 		return text;
 	end
+end
+
+local SANITIZATION_PATTERNS = {
+	["|c%x%x%x%x%x%x%x%x"] = "", -- color start
+	["|r"] = "", -- color end
+	["|H.-|h(.-)|h"] = "%1", -- links
+	["|T.-|t"] = "", -- textures
+}
+
+---Sanitize a given text, removing potentially harmful escape sequences that could have been added by a end user (to display huge icons in their tooltips, for example).
+---@param text string @ A text that should be sanitized
+---@return string sanitizedText @ The sanitized version of the given text
+function Strings.sanitize(text)
+	if not text then
+		return
+	end
+	for k, v in pairs(SANITIZATION_PATTERNS) do
+		text = gsub(text, k, v);
+	end
+	return text;
+end
+
+---Crop a string of text if it is longer than the given size, and append … to indicate that the text has been cropped by default.
+---@param text string @ The string of text that will be cropped
+---@param size number @ The number of characters at which the text will be cropped.
+---@param optional appendEllipsisAtTheEnd boolean @ Indicates if ellipsis (…) should be appended at the end of the text when cropped (defaults to true)
+---@return string croppedText @ The cropped version of the text if it was longer than the given size, or the untouched version if the text was shorter.
+function Strings.crop(text, size, appendEllipsisAtTheEnd)
+	assert(isType(text, "text", "text"));
+	assert(isType(size, "number", "size"));
+	assert(size > 0, "Size has to be a positive number.");
+
+	if appendEllipsisAtTheEnd == nil then
+		appendEllipsisAtTheEnd = true;
+	end
+
+	text = strtrim(text or "");
+	if text:len() > size then
+		text = text:sub(1, size);
+		if appendEllipsisAtTheEnd then
+			text = text .. "…";
+		end
+	end
+	return text
+end
+
+local COLORS_SHORTCUT = {
+	["r"] = "RED",
+	["g"] = "GREEN",
+	["b"] = "BLUE",
+	["y"] = "YELLOW",
+	["p"] = "PURPLE",
+	["c"] = "CYAN",
+	["w"] = "WHITE",
+	["0"] = "BLACK",
+	["o"] = "ORANGE",
+}
+
+--- Returns a color tag based on a letter (shortcut)
+function Strings.color(colorShortcut)
+	if not colorShortcut then
+		colorShortcut = "w"; -- default color if bad argument
+	end
+	local color = TRP3_API.Colors.COLORS[COLORS_SHORTCUT[COLORS_SHORTCUT]] or TRP3_API.Colors.COLORS.WHITE;
+	return "|c" .. color:GenerateHexColor();
 end

@@ -69,6 +69,24 @@ function TRP3_ColorMixin:LightenColorUntilItIsReadable()
 	end
 end
 
+--- Linear interpolation of a transition between the current color and a given RGB value at a delta step
+---@param delta number @ Between 0 and 1
+---@param toR number @ Between 0 and 1
+---@param toG number @ Between 0 and 1
+---@param toB number @ Between 0 and 1
+function TRP3_ColorMixin:Lerp(delta, toR, toG, toB)
+	local lerpR, lerpG, lerpB = TRP3_API.Math.color(delta, self.r, self.g, self.b, toR, toG, toB);
+	self.r = lerpR;
+	self.g = lerpG;
+	self.b = lerpB;
+end
+
+--- Creates a clone (new table/object) of the current color
+--- @return TRP3_ColorMixin color @ A clone of the color
+function TRP3_ColorMixin:Clone()
+	return Colors.createColorFromTable(self);
+end
+
 ---Convert color bytes into bits, from a 0-255 range to 0-1 range.
 ---@param red number @ Between 0 and 255
 ---@param green number @ Between 0 and 255
@@ -264,8 +282,11 @@ Colors.COLORS = {
 	WHITE 	= Colors.createColor(1, 1, 1),
 	YELLOW 	= Colors.createColor(1, 0.75, 0),
 	CYAN	= Colors.createColor(0, 1, 1),
+	BLUE    = Colors.createColor(0, 0, 1),
 	GREEN	= Colors.createColor(0, 1, 0),
 	RED		= Colors.createColor(1, 0, 0),
+	PURPLE  = Colors.createColor(1, 0, 1),
+	BLACK   = Colors.createColor(0, 0, 0),
 
 	-- CLASSES
 	HUNTER 		= Colors.createColorFromTable(RAID_CLASS_COLORS.HUNTER),

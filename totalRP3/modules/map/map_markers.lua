@@ -36,19 +36,6 @@ local CONFIG_UI_ANIMATIONS = "ui_animations";
 local TRP3_ScanLoaderFrame = TRP3_ScanLoaderFrame;
 
 --*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
--- Utils
---*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-
-local GetPlayerMapPosition = GetPlayerMapPosition;
-local GetCurrentMapAreaID = GetCurrentMapAreaID;
-
-function TRP3_API.map.getCurrentCoordinates()
-	local mapID = GetCurrentMapAreaID();
-	local x, y = GetPlayerMapPosition("player");
-	return mapID, x, y;
-end
-
---*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 -- Marker logic
 --*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 ---@type GameTooltip

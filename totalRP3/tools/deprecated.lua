@@ -86,7 +86,6 @@ TRP3_API.locale = setUpAPIDeprecatedWarning(TRP3_API.Locale, "Locale", "TRP3_API
 -- Logs API
 -- Note we will avoid throwing warning when using the old logging API because it is already chatty enough and can lead to infinite loops :P
 TRP3_API.utils.log = {};
-print("Mapping log");
 TRP3_API.utils.log.level = TRP3_API.Logs.LEVELS;
 TRP3_API.utils.log.log = function(message, level)
 	if not level then level = TRP3_API.Logs.LEVELS.INFO end
@@ -119,3 +118,27 @@ TRP3_API.utils.str.GetFaction = setUpDeprecatedFunctionWarning(TRP3_API.Unit.get
 TRP3_API.utils.str.getUnitDataFromGUID = setUpDeprecatedFunctionWarning(TRP3_API.Unit.getNPCData, "TRP3_API.utils.str.getUnitDataFromGUID", "TRP3_API.Unit.getNPCData");
 TRP3_API.utils.str.getUnitNPCID = setUpDeprecatedFunctionWarning(TRP3_API.Unit.getUnitNPCID, "TRP3_API.utils.str.getUnitNPCID", "TRP3_API.Unit.getUnitNPCID");
 TRP3_API.utils.str.getUnitID = setUpDeprecatedFunctionWarning(TRP3_API.Unit.getUnitID, "TRP3_API.utils.str.getUnitID", "TRP3_API.Unit.getUnitID");
+
+-- Serial API
+TRP3_API.utils.serial = setUpAPIDeprecatedWarning(TRP3_API.Serial, "Serial", "TRP3_API.utils.serial", "TRP3_API.Serial");
+
+-- Math API
+TRP3_API.utils.math = setUpAPIDeprecatedWarning(TRP3_API.Math, "Math", "TRP3_API.utils.math", "TRP3_API.Math");
+
+-- Utils.pcall
+local pcall = pcall;
+TRP3_API.utils.pcall = setUpDeprecatedFunctionWarning(function(func, ...)
+	if func then
+		return { pcall(func, ...) };
+	end
+end, "TRP3_API.utils.pcall", "{pcall(...)}");
+
+-- Messaging API
+TRP3_API.utils.message = setUpAPIDeprecatedWarning(TRP3_API.Messages, "Messaging", "TRP3_API.utils.message", "TRP3_API.Messages");
+TRP3_API.utils.message.type = TRP3_API.Messages.TYPES;
+
+-- Map API
+TRP3_API.utils.str.buildZoneText = setUpDeprecatedFunctionWarning(TRP3_API.Map.getCurrentZoneText, "TRP3_API.utils.str.buildZoneText", "TRP3_API.Map.getCurrentZoneText");
+
+TRP3_API.map = {};
+TRP3_API.map.getCurrentCoordinates = setUpDeprecatedFunctionWarning(TRP3_API.Map.getCurrentCoordinates, "TRP3_API.map.getCurrentCoordinates", "TRP3_API.Map.getCurrentCoordinates");

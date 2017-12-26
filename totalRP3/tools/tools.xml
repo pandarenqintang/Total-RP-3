@@ -38,14 +38,18 @@
 	<Script file="strings.lua"/>
 	<Script file="GUID.lua"/>
 	<Script file="colors.lua"/>
+	<Script file="math.lua"/>
 	<Script file="logs.lua"/>
+	<Script file="serial.lua"/>
 	<Script file="tables.lua"/>
+	<Script file="messages.lua"/>
 	<Script file="localization.lua"/>
 	<Script file="unit.lua"/>
 	<Script file="html.lua"/>
 	<Script file="sounds.lua"/>
 	<Script file="events.lua"/>
 	<Script file="textures.lua"/>
+	<Script file="map.lua"/>
 	<Script file="workarounds.lua"/>
 	<Script file="deprecated.lua"/>
 
