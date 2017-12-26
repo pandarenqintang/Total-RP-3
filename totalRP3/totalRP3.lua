@@ -18,7 +18,7 @@
 ----------------------------------------------------------------------------------
 
 -- Imports
-local Globals = TRP3_API.globals;
+local Globals = TRP3_API.Globals;
 local Log = TRP3_API.utils.log;
 
 --*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*

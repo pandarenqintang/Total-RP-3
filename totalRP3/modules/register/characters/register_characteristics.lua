@@ -566,8 +566,8 @@ function setEditDisplay()
 	TRP3_RegisterCharact_Edit_AgeField:SetText(draftData.AG or "");
 	TRP3_RegisterCharact_Edit_EyeField:SetText(draftData.EC or "");
 
-	TRP3_RegisterCharact_Edit_EyeButton.setColor(hexaToNumber(draftData.EH))
-	TRP3_RegisterCharact_Edit_ClassButton.setColor(hexaToNumber(draftData.CH));
+	TRP3_RegisterCharact_Edit_EyeButton.setColor(hexaToNumber(draftData.EH or ""))
+	TRP3_RegisterCharact_Edit_ClassButton.setColor(hexaToNumber(draftData.CH or ""));
 
 	TRP3_RegisterCharact_Edit_HeightField:SetText(draftData.HE or "");
 	TRP3_RegisterCharact_Edit_WeightField:SetText(draftData.WE or "");

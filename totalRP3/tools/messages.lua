@@ -29,7 +29,10 @@ TRP3_API.Messages = Messages;
 -- WoW imports
 local tostring = tostring;
 
-local MESSAGE_PREFIX = "[" .. TRP3_API.Colors.COLORS.YELLOW:WrapTextInColorCode(TRP3_API.globals.addon_name_short) .. "]";
+-- Total RP 3 imports
+local Events = TRP3_API.Events;
+
+local MESSAGE_PREFIX = "[TRP3]";
 
 local function getChatFrame(chatFrameIndex)
 	return _G["ChatFrame" .. tostring(chatFrameIndex)] or DEFAULT_CHAT_FRAME;
@@ -67,3 +70,7 @@ function Messages.displayMessage(message, messageType, noPrefix, chatFrameIndex)
 		UIErrorsFrame:AddMessage(message, 1.0, 0.0, 0.0);
 	end
 end
+
+Events.listenToEvent(Events.EVENTS.WORKFLOW_ON_LOADED, function()
+	MESSAGE_PREFIX = "[" .. TRP3_API.Colors.COLORS.YELLOW:WrapTextInColorCode(TRP3_API.globals.addon_name_short) .. "]";
+end)

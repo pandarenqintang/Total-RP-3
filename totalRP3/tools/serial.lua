@@ -80,15 +80,15 @@ function Serial.safeEncodeCompressMessage(serial)
 end
 
 function Serial.decompressCodedStructure(message)
-	return deserialize(libCompress:Decompress(libCompressEncoder:Decode(message)));
+	return Serial.deserialize(libCompress:Decompress(libCompressEncoder:Decode(message)));
 end
 
 function Serial.safeDecompressCodedStructure(message)
-	return safeDeserialize(libCompress:Decompress(libCompressEncoder:Decode(message)));
+	return Serial.safeDeserialize(libCompress:Decompress(libCompressEncoder:Decode(message)));
 end
 
 function Serial.encodeCompressStructure(structure)
-	return encodeCompressMessage(serialize(structure));
+	return Serial.encodeCompressMessage(Serial.serialize(structure));
 end
 
 function Serial.hashCode(str)

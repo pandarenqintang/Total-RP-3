@@ -91,8 +91,8 @@ function Logs.log(level, ...)
 		message = message
 	});
 
-	if TRP3_API.globals.DEBUG_MODE then
-		print(message);
+	if TRP3_API.Globals.DEBUG_MODE then
+		-- print(message);
 	end
 end
 

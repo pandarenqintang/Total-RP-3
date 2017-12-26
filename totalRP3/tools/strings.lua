@@ -186,7 +186,7 @@ end
 ---@param text string @ The string to test
 ---@param pattern string @ The pattern to match
 ---@return boolean|nil matched @ Returns true if the pattern was matched in the given text
-function Strings.safeMath(text, pattern)
+function Strings.safeMatch(text, pattern)
 	local trace = {pcall(string.find, text, pattern)};
 	if trace[1] then
 		return type(trace[2]) == "number";
@@ -275,7 +275,8 @@ end
 ---@param optional appendEllipsisAtTheEnd boolean @ Indicates if ellipsis (…) should be appended at the end of the text when cropped (defaults to true)
 ---@return string croppedText @ The cropped version of the text if it was longer than the given size, or the untouched version if the text was shorter.
 function Strings.crop(text, size, appendEllipsisAtTheEnd)
-	assert(isType(text, "text", "text"));
+	if not text then return end
+
 	assert(isType(size, "number", "size"));
 	assert(size > 0, "Size has to be a positive number.");
 
@@ -293,23 +294,8 @@ function Strings.crop(text, size, appendEllipsisAtTheEnd)
 	return text
 end
 
-local COLORS_SHORTCUT = {
-	["r"] = "RED",
-	["g"] = "GREEN",
-	["b"] = "BLUE",
-	["y"] = "YELLOW",
-	["p"] = "PURPLE",
-	["c"] = "CYAN",
-	["w"] = "WHITE",
-	["0"] = "BLACK",
-	["o"] = "ORANGE",
-}
-
 --- Returns a color tag based on a letter (shortcut)
 function Strings.color(colorShortcut)
-	if not colorShortcut then
-		colorShortcut = "w"; -- default color if bad argument
-	end
-	local color = TRP3_API.Colors.COLORS[COLORS_SHORTCUT[COLORS_SHORTCUT]] or TRP3_API.Colors.COLORS.WHITE;
+	local color = TRP3_API.Colors.get(colorShortcut);
 	return "|c" .. color:GenerateHexColor();
 end

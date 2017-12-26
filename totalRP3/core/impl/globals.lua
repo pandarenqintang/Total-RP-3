@@ -83,6 +83,7 @@ local Globals = {
 };
 
 TRP3_API.Globals = Globals;
+TRP3_API.globals = TRP3_API.Deprecated.setUpAPIDeprecatedWarning(Globals, "Globals", "TRP3_API.globals", "TRP3_API.Globals");
 
 TRP3_API.formats = {
 	dropDownElements = "%s: |cff00ff00%s"

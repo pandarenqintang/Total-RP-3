@@ -217,7 +217,7 @@ end
 ---@param button Button @ A button with either a icon as a key or as a named child
 ---@param icon string @ An icon texture
 function Frames.setupIconButton(button, icon)
-	assert(isType(button, "Button", "button"));
+	assert(isType(button, "Frame", "button"));
 	local iconFrame = button.Icon or (button:GetName() and _G[button:GetName() .. "Icon"]);
 	assert(isType(iconFrame, "Texture", "button.Icon"));
 	iconFrame:SetTexture(Textures.iconPath(icon));

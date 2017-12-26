@@ -17,11 +17,8 @@
 --	limitations under the License.
 ----------------------------------------------------------------------------------
 
-TRP3_API.ui.tooltip = {};
 TRP3_API.ui.listbox = {};
 TRP3_API.ui.list = {};
-TRP3_API.ui.misc = {};
-TRP3_API.ui.frame = {};
 TRP3_API.ui.text = {};
 
 -- imports

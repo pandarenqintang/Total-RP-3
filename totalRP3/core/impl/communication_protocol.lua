@@ -25,6 +25,7 @@ local _, TRP3_API = ...;
 
 local Communications = {};
 TRP3_API.Communications = Communications;
+TRP3_API.communication = TRP3_API.Deprecated.setUpAPIDeprecatedWarning(TRP3_API.Communications, "Communications", "TRP3_API.communication", "TRP3_API.Communications");
 
 -- WoW imports
 local RegisterAddonMessagePrefix = RegisterAddonMessagePrefix;
@@ -293,7 +294,7 @@ local PREFIX_REGISTRATION = {};
 
 -- Register a function to callback when receiving a object attached to the given prefix
 function Communications.registerProtocolPrefix(prefix, callback)
-	assert(isType(prefix), "string", "prefix");
+	assert(isType(prefix, "string", "prefix"));
 	assert(isType(callback, "function", "callback"));
 	if PREFIX_REGISTRATION[prefix] == nil then
 		PREFIX_REGISTRATION[prefix] = {};

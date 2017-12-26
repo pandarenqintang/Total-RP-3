@@ -25,6 +25,8 @@ TRP3_API.map = {};
 
 local MapMarkers = {};
 TRP3_API.MapMarkers = MapMarkers;
+TRP3_API.map = {};
+TRP3_API.map.getCurrentCoordinates = TRP3_API.Deprecated.setUpDeprecatedFunctionWarning(TRP3_API.Map.getCurrentCoordinates, "TRP3_API.map.getCurrentCoordinates", "TRP3_API.Map.getCurrentCoordinates");
 
 -- WoW imports
 local tinsert, assert, tonumber, pairs, _G, wipe = tinsert, assert, tonumber, pairs, _G, wipe;
@@ -114,7 +116,7 @@ local function placeMarker(marker, x, y)
 end
 
 local function animateMarker(marker, x, y, directAnimation)
-	if Configuration.getConfigValue(Configuration.KEYS.UI_ANIMATIONS) then
+	if Configuration.getValue(Configuration.KEYS.UI_ANIMATIONS) then
 
 		local distanceX = 0.5 - x;
 		local distanceY = 0.5 - y;
@@ -248,7 +250,7 @@ function launchScan(scanID)
 				playAnimation(TRP3_ScanLoaderBackAnimationGrow1);
 				playAnimation(TRP3_ScanLoaderBackAnimationGrow2);
 				playAnimation(TRP3_ScanFadeOut);
-				if getConfigValue(CONFIG_UI_ANIMATIONS) then
+				if Configuration.getValue(Configuration.KEYS.UI_ANIMATIONS) then
 					after(1, function()
 						TRP3_ScanLoaderFrame:Hide();
 						TRP3_ScanLoaderFrame:SetAlpha(1);
@@ -334,7 +336,7 @@ local function placeMapButton(position)
 
 	worldMapButton:SetPoint(position, WorldMapFrame.UIElementsFrame, position, xPadding, yPadding);
 
-	Configuration.setConfigValue(Configuration.KEYS.MAP_BUTTON_POSITION, position);
+	Configuration.setValue(Configuration.KEYS.MAP_BUTTON_POSITION, position);
 end
 
 Events.listenToEvent(Events.EVENTS.WORKFLOW_ON_LOADED, function()
@@ -361,6 +363,6 @@ Events.listenToEvent(Events.EVENTS.WORKFLOW_ON_LOADED, function()
 		configKey = Configuration.KEYS.MAP_BUTTON_POSITION,
 	});
 
-	placeMapButton(Configuration.getConfigValue(Configuration.KEYS.MAP_BUTTON_POSITION));
+	placeMapButton(Configuration.getValue(Configuration.KEYS.MAP_BUTTON_POSITION));
 
 end);

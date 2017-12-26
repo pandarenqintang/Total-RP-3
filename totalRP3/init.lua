@@ -45,6 +45,7 @@ TRP3_API.r = {};
 -- I will be moving all the stuff from totalRP3/core/impl/utils to their own modules
 -- To ensure backward compatibility, we will keep an reference to the old utils table
 TRP3_API.utils = {};
+TRP3_API.utils.resources = {};
 TRP3_API.ui = {};
 
 

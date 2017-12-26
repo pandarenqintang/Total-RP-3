@@ -131,6 +131,7 @@ local function selectProfile(profileID)
 	currentProfile = profiles[profileID];
 	currentProfileId = profileID;
 	character.profileID = profileID;
+	_G.TRPCOLOR = Utils.str.color("g");
 	displayMessage(loc("PR_PROFILE_LOADED"):format(Utils.str.color("g")..profiles[character.profileID]["profileName"].."|r"));
 	Events.fireEvent(Events.REGISTER_PROFILES_LOADED, currentProfile);
 	Events.fireEvent(Events.REGISTER_DATA_UPDATED, Globals.player_id, profileID);

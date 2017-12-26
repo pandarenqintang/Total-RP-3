@@ -34,6 +34,20 @@
 		</Scripts>
 	</ScrollingMessageFrame>
 
+	<Frame name="TRP3_ResizeShadowFrame" parent="UIParent" frameStrata="FULLSCREEN" hidden="true" resizable="true">
+		<Backdrop edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true" bgFile="Interface\DialogFrame\UI-DialogBox-Background">
+			<EdgeSize><AbsValue val="24"/></EdgeSize><TileSize><AbsValue val="400"/></TileSize>
+			<BackgroundInsets><AbsInset left="5" right="5" top="5" bottom="5"/></BackgroundInsets>
+		</Backdrop>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString parentKey="text" inherits="GameFontNormal" setAllPoints="true">
+					<Color b="1.0" r="1.0" g="1.0"/>
+				</FontString>
+			</Layer>
+		</Layers>
+	</Frame>
+
 	<Script file="assertions.lua"/>
 	<!-- Events must be loaded as soon as possible so we can listen to the WORKFLOW_ON_LOADED event here -->
 	<Script file="events.lua"/>
@@ -52,6 +66,7 @@
 	<Script file="sounds.lua"/>
 	<Script file="gameEvents.lua"/>
 	<Script file="textures.lua"/>
+	<Include file="tooltips.xml"/>
 	<Script file="frames.lua"/>
 	<Script file="map.lua"/>
 	<Script file="workarounds.lua"/>

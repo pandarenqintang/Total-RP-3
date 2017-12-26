@@ -25,6 +25,9 @@
 ---@type TRP3_API
 local _, TRP3_API = ...;
 
+local Deprecated = {};
+TRP3_API.Deprecated = Deprecated;
+
 -- WoW imports
 local setmetatable = setmetatable;
 local format = string.format;
@@ -35,7 +38,7 @@ local DEPRECATED_FUNCTION = [[Function %s is deprecated and will be removed in v
 
 local NEXT_DEPRECATION_VERSION = "1.4.0";
 
-local function setUpAPIDeprecatedWarning(newAPI, apiName, oldPath, newPath)
+function Deprecated.setUpAPIDeprecatedWarning(newAPI, apiName, oldPath, newPath)
 	return setmetatable({}, {
 		__index = function(_, key)
 			TRP3_API.Logs.warning(format(DEPRECATED_API_MOVED, apiName, oldPath, NEXT_DEPRECATION_VERSION, newPath));
@@ -44,7 +47,7 @@ local function setUpAPIDeprecatedWarning(newAPI, apiName, oldPath, newPath)
 	});
 end
 
-local function setUpDeprecatedFunctionWarning(newFunction, oldFunctionName, newFunctionName)
+function Deprecated.setUpDeprecatedFunctionWarning(newFunction, oldFunctionName, newFunctionName)
 	return function(...)
 		TRP3_API.Logs.warning(format(DEPRECATED_FUNCTION, oldFunctionName, NEXT_DEPRECATION_VERSION, newFunctionName));
 		return newFunction(...);
@@ -56,32 +59,32 @@ end
 --*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 -- String API
-TRP3_API.utils.str = setUpAPIDeprecatedWarning(TRP3_API.Strings, "Strings", "TRP3_API.utils.str", "TRP3_API.Strings");
+TRP3_API.utils.str = Deprecated.setUpAPIDeprecatedWarning(TRP3_API.Strings, "Strings", "TRP3_API.utils.str", "TRP3_API.Strings");
+TRP3_API.utils.str.id = Deprecated.setUpDeprecatedFunctionWarning(TRP3_API.Strings.generateID, "TRP3_API.utils.str.id", "TRP3_API.Strings.generateID");
 
 -- HTML API
-TRP3_API.utils.str.toHTML = setUpDeprecatedFunctionWarning(TRP3_API.HTML.convertTRP3TagsIntoHTML, "TRP3_API.utils.str.toHTML", "TRP3_API.HTML.convertTRP3TagsIntoHTML");
+TRP3_API.utils.str.toHTML = Deprecated.setUpDeprecatedFunctionWarning(TRP3_API.HTML.convertTRP3TagsIntoHTML, "TRP3_API.utils.str.toHTML", "TRP3_API.HTML.convertTRP3TagsIntoHTML");
 
 -- Colors API
-TRP3_API.utils.color = setUpAPIDeprecatedWarning(TRP3_API.Colors, "Colors", "TRP3_API.utils.color", "TRP3_API.Colors");
-TRP3_API.utils.color.CreateColor = setUpDeprecatedFunctionWarning(TRP3_API.Colors.createColor, "TRP3_API.utils.color.CreateColor", "TRP3_API.Colors.createColor");
-TRP3_API.utils.color.getColorFromHexadecimalCode = setUpDeprecatedFunctionWarning(TRP3_API.Colors.createColorFromHexadecimalCode, "TRP3_API.utils.color.getColorFromHexadecimalCode", "TRP3_API.Colors.createColorFromHexadecimalCode");
-TRP3_API.utils.color.GetClassColorByGUID = setUpDeprecatedFunctionWarning(TRP3_API.GUID.getClassColor, "TRP3_API.utils.color.GetClassColorByGUID", "TRP3_API.GUID.getClassColor");
-TRP3_API.utils.color.GetCustomColorByGUID = setUpDeprecatedFunctionWarning(TRP3_API.GUID.getCustomColor, "TRP3_API.utils.color.GetCustomColorByGUID", "TRP3_API.GUID.getCustomColor");
-TRP3_API.utils.color.getUnitColorByGUID = setUpDeprecatedFunctionWarning(TRP3_API.GUID.getUnitColor, "TRP3_API.utils.color.getUnitColorByGUID", "TRP3_API.GUID.getUnitColor");
-TRP3_API.utils.color.getUnitCustomColor = setUpDeprecatedFunctionWarning(function(...)
+TRP3_API.utils.color = Deprecated.setUpAPIDeprecatedWarning(TRP3_API.Colors, "Colors", "TRP3_API.utils.color", "TRP3_API.Colors");
+TRP3_API.utils.color.CreateColor = Deprecated.setUpDeprecatedFunctionWarning(TRP3_API.Colors.createColor, "TRP3_API.utils.color.CreateColor", "TRP3_API.Colors.createColor");
+TRP3_API.utils.color.getColorFromHexadecimalCode = Deprecated.setUpDeprecatedFunctionWarning(TRP3_API.Colors.createColorFromHexadecimalCode, "TRP3_API.utils.color.getColorFromHexadecimalCode", "TRP3_API.Colors.createColorFromHexadecimalCode");
+TRP3_API.utils.color.GetClassColorByGUID = Deprecated.setUpDeprecatedFunctionWarning(TRP3_API.GUID.getClassColor, "TRP3_API.utils.color.GetClassColorByGUID", "TRP3_API.GUID.getClassColor");
+TRP3_API.utils.color.GetCustomColorByGUID = Deprecated.setUpDeprecatedFunctionWarning(TRP3_API.GUID.getCustomColor, "TRP3_API.utils.color.GetCustomColorByGUID", "TRP3_API.GUID.getCustomColor");
+TRP3_API.utils.color.getUnitColorByGUID = Deprecated.setUpDeprecatedFunctionWarning(TRP3_API.GUID.getUnitColor, "TRP3_API.utils.color.getUnitColorByGUID", "TRP3_API.GUID.getUnitColor");
+TRP3_API.utils.color.getUnitCustomColor = Deprecated.setUpDeprecatedFunctionWarning(function(...)
 	TRP3_API.register.getUnitCustomColor(...);
 end , "TRP3_API.utils.color.getUnitCustomColor", "TRP3_API.register.getUnitCustomColor");
-TRP3_API.utils.str.color = setUpDeprecatedFunctionWarning(TRP3_API.Colors.get, "TRP3_API.utils.str.color", "TRP3_API.Colors.get");
 
 -- Events API
-TRP3_API.utils.event = setUpAPIDeprecatedWarning(TRP3_API.GameEvents, "GameEvents", "TRP3_API.utils.event", "TRP3_API.GameEvents");
+TRP3_API.utils.event = Deprecated.setUpAPIDeprecatedWarning(TRP3_API.GameEvents, "GameEvents", "TRP3_API.utils.event", "TRP3_API.GameEvents");
 
 -- GUID API
-TRP3_API.utils.guid = setUpAPIDeprecatedWarning(TRP3_API.GUID, "GUID", "TRP3_API.utils.guid", "TRP3_API.GUID");
+TRP3_API.utils.guid = Deprecated.setUpAPIDeprecatedWarning(TRP3_API.GUID, "GUID", "TRP3_API.utils.guid", "TRP3_API.GUID");
 TRP3_API.utils.str.getUnitDataFromGUIDDirect = TRP3_API.GUID.getNPCData;
 
 -- Locale API
-TRP3_API.locale = setUpAPIDeprecatedWarning(TRP3_API.Locale, "Locale", "TRP3_API.locale", "TRP3_API.Locale");
+TRP3_API.locale = Deprecated.setUpAPIDeprecatedWarning(TRP3_API.Locale, "Locale", "TRP3_API.locale", "TRP3_API.Locale");
 
 -- Logs API
 -- Note we will avoid throwing warning when using the old logging API because it is already chatty enough and can lead to infinite loops :P
@@ -92,10 +95,11 @@ TRP3_API.utils.log.log = function(message, level)
 	TRP3_API.Logs.log(level, message);
 end
 
+TRP3_API.ui.misc = {};
 -- Sounds API
-TRP3_API.utils.music = setUpAPIDeprecatedWarning(TRP3_API.Sounds, "Sounds", "TRP3_API.utils.music", "TRP3_API.Sounds");
-TRP3_API.ui.misc.playSoundKit = setUpDeprecatedFunctionWarning(TRP3_API.Sounds.playUISound, "TRP3_API.ui.misc.playSoundKit", "TRP3_API.Sounds.playUISound");
-TRP3_API.ui.misc.playUISound = setUpDeprecatedFunctionWarning(TRP3_API.Sounds.playUISound, "TRP3_API.ui.misc.playUISound", "TRP3_API.Sounds.playUISound");
+TRP3_API.utils.music = Deprecated.setUpAPIDeprecatedWarning(TRP3_API.Sounds, "Sounds", "TRP3_API.utils.music", "TRP3_API.Sounds");
+TRP3_API.ui.misc.playSoundKit = Deprecated.setUpDeprecatedFunctionWarning(TRP3_API.Sounds.playUISound, "TRP3_API.ui.misc.playSoundKit", "TRP3_API.Sounds.playUISound");
+TRP3_API.ui.misc.playUISound = Deprecated.setUpDeprecatedFunctionWarning(TRP3_API.Sounds.playUISound, "TRP3_API.ui.misc.playUISound", "TRP3_API.Sounds.playUISound");
 -- Manually register a played sound callback for Extended's sound history frame
 TRP3_API.Sounds.registerOnSoundPlayedCallback(function()
 	if TRP3_SoundsHistoryFrame then
@@ -104,76 +108,66 @@ TRP3_API.Sounds.registerOnSoundPlayedCallback(function()
 end);
 
 -- Tables API
-TRP3_API.utils.table = setUpAPIDeprecatedWarning(TRP3_API.Tables, "Tables", "TRP3_API.utils.table", "TRP3_API.Tables");
+TRP3_API.utils.table = Deprecated.setUpAPIDeprecatedWarning(TRP3_API.Tables, "Tables", "TRP3_API.utils.table", "TRP3_API.Tables");
 
 -- Textures API
-TRP3_API.utils.texture = setUpAPIDeprecatedWarning(TRP3_API.Textures, "Textures", "TRP3_API.utils.texture", "TRP3_API.Textures");
-TRP3_API.utils.str.texture = setUpDeprecatedFunctionWarning(TRP3_API.Textures.tag, "TRP3_API.utils.str.texture", "TRP3_API.Textures.tag");
-TRP3_API.utils.str.icon = setUpDeprecatedFunctionWarning(TRP3_API.Textures.iconTag, "TRP3_API.utils.str.icon", "TRP3_API.Textures.iconTag");
-TRP3_API.ui.misc.getUnitTexture = setUpDeprecatedFunctionWarning(TRP3_API.Textures.getUnitTexture, "TRP3_API.ui.misc.getUnitTexture", "TRP3_API.Textures.getUnitTexture");
-TRP3_API.ui.misc.getClassTexture = setUpDeprecatedFunctionWarning(TRP3_API.Textures.getClassTexture, "TRP3_API.ui.misc.getClassTexture", "TRP3_API.Textures.getClassTexture");
+TRP3_API.utils.texture = Deprecated.setUpAPIDeprecatedWarning(TRP3_API.Textures, "Textures", "TRP3_API.utils.texture", "TRP3_API.Textures");
+TRP3_API.utils.str.texture = Deprecated.setUpDeprecatedFunctionWarning(TRP3_API.Textures.tag, "TRP3_API.utils.str.texture", "TRP3_API.Textures.tag");
+TRP3_API.utils.str.icon = Deprecated.setUpDeprecatedFunctionWarning(TRP3_API.Textures.iconTag, "TRP3_API.utils.str.icon", "TRP3_API.Textures.iconTag");
+TRP3_API.ui.misc.getUnitTexture = Deprecated.setUpDeprecatedFunctionWarning(TRP3_API.Textures.getUnitTexture, "TRP3_API.ui.misc.getUnitTexture", "TRP3_API.Textures.getUnitTexture");
+TRP3_API.ui.misc.getClassTexture = Deprecated.setUpDeprecatedFunctionWarning(TRP3_API.Textures.getClassTexture, "TRP3_API.ui.misc.getClassTexture", "TRP3_API.Textures.getClassTexture");
 
 -- Unit API
-TRP3_API.utils.str.GetGuildName = setUpDeprecatedFunctionWarning(TRP3_API.Unit.getGuildName, "TRP3_API.utils.str.GetGuildName", "TRP3_API.Unit.getGuildName");
-TRP3_API.utils.str.GetGuildRank = setUpDeprecatedFunctionWarning(TRP3_API.Unit.getGuildRank, "TRP3_API.utils.str.GetGuildRank", "TRP3_API.Unit.getGuildRank");
-TRP3_API.utils.str.GetRace = setUpDeprecatedFunctionWarning(TRP3_API.Unit.getRace, "TRP3_API.utils.str.GetRace", "TRP3_API.Unit.getRace");
-TRP3_API.utils.str.GetClass = setUpDeprecatedFunctionWarning(TRP3_API.Unit.getClass, "TRP3_API.utils.str.GetClass", "TRP3_API.Unit.getClass");
-TRP3_API.utils.str.GetFaction = setUpDeprecatedFunctionWarning(TRP3_API.Unit.getFaction, "TRP3_API.utils.str.GetFaction", "TRP3_API.Unit.getFaction");
-TRP3_API.utils.str.getUnitDataFromGUID = setUpDeprecatedFunctionWarning(TRP3_API.Unit.getNPCData, "TRP3_API.utils.str.getUnitDataFromGUID", "TRP3_API.Unit.getNPCData");
-TRP3_API.utils.str.getUnitNPCID = setUpDeprecatedFunctionWarning(TRP3_API.Unit.getUnitNPCID, "TRP3_API.utils.str.getUnitNPCID", "TRP3_API.Unit.getUnitNPCID");
-TRP3_API.utils.str.getUnitID = setUpDeprecatedFunctionWarning(TRP3_API.Unit.getUnitID, "TRP3_API.utils.str.getUnitID", "TRP3_API.Unit.getUnitID");
+TRP3_API.utils.str.GetGuildName = Deprecated.setUpDeprecatedFunctionWarning(TRP3_API.Unit.getGuildName, "TRP3_API.utils.str.GetGuildName", "TRP3_API.Unit.getGuildName");
+TRP3_API.utils.str.GetGuildRank = Deprecated.setUpDeprecatedFunctionWarning(TRP3_API.Unit.getGuildRank, "TRP3_API.utils.str.GetGuildRank", "TRP3_API.Unit.getGuildRank");
+TRP3_API.utils.str.GetRace = Deprecated.setUpDeprecatedFunctionWarning(TRP3_API.Unit.getRace, "TRP3_API.utils.str.GetRace", "TRP3_API.Unit.getRace");
+TRP3_API.utils.str.GetClass = Deprecated.setUpDeprecatedFunctionWarning(TRP3_API.Unit.getClass, "TRP3_API.utils.str.GetClass", "TRP3_API.Unit.getClass");
+TRP3_API.utils.str.GetFaction = Deprecated.setUpDeprecatedFunctionWarning(TRP3_API.Unit.getFaction, "TRP3_API.utils.str.GetFaction", "TRP3_API.Unit.getFaction");
+TRP3_API.utils.str.getUnitDataFromGUID = Deprecated.setUpDeprecatedFunctionWarning(TRP3_API.Unit.getNPCData, "TRP3_API.utils.str.getUnitDataFromGUID", "TRP3_API.Unit.getNPCData");
+TRP3_API.utils.str.getUnitNPCID = Deprecated.setUpDeprecatedFunctionWarning(TRP3_API.Unit.getUnitNPCID, "TRP3_API.utils.str.getUnitNPCID", "TRP3_API.Unit.getUnitNPCID");
+TRP3_API.utils.str.getUnitID = Deprecated.setUpDeprecatedFunctionWarning(TRP3_API.Unit.getUnitID, "TRP3_API.utils.str.getUnitID", "TRP3_API.Unit.getUnitID");
 
 -- Serial API
-TRP3_API.utils.serial = setUpAPIDeprecatedWarning(TRP3_API.Serial, "Serial", "TRP3_API.utils.serial", "TRP3_API.Serial");
+TRP3_API.utils.serial = Deprecated.setUpAPIDeprecatedWarning(TRP3_API.Serial, "Serial", "TRP3_API.utils.serial", "TRP3_API.Serial");
 
 -- Math API
-TRP3_API.utils.math = setUpAPIDeprecatedWarning(TRP3_API.Math, "Math", "TRP3_API.utils.math", "TRP3_API.Math");
+TRP3_API.utils.math = Deprecated.setUpAPIDeprecatedWarning(TRP3_API.Math, "Math", "TRP3_API.utils.math", "TRP3_API.Math");
 
 -- Utils.pcall
 local pcall = pcall;
-TRP3_API.utils.pcall = setUpDeprecatedFunctionWarning(function(func, ...)
+TRP3_API.utils.pcall = Deprecated.setUpDeprecatedFunctionWarning(function(func, ...)
 	if func then
 		return { pcall(func, ...) };
 	end
 end, "TRP3_API.utils.pcall", "{pcall(...)}");
 
 -- Messaging API
-TRP3_API.utils.message = setUpAPIDeprecatedWarning(TRP3_API.Messages, "Messaging", "TRP3_API.utils.message", "TRP3_API.Messages");
+TRP3_API.utils.message = Deprecated.setUpAPIDeprecatedWarning(TRP3_API.Messages, "Messaging", "TRP3_API.utils.message", "TRP3_API.Messages");
 TRP3_API.utils.message.type = TRP3_API.Messages.TYPES;
 
 -- Map API
-TRP3_API.utils.str.buildZoneText = setUpDeprecatedFunctionWarning(TRP3_API.Map.getCurrentZoneText, "TRP3_API.utils.str.buildZoneText", "TRP3_API.Map.getCurrentZoneText");
-
-TRP3_API.map = {};
-TRP3_API.map.getCurrentCoordinates = setUpDeprecatedFunctionWarning(TRP3_API.Map.getCurrentCoordinates, "TRP3_API.map.getCurrentCoordinates", "TRP3_API.Map.getCurrentCoordinates");
+TRP3_API.utils.str.buildZoneText = Deprecated.setUpDeprecatedFunctionWarning(TRP3_API.Map.getCurrentZoneText, "TRP3_API.utils.str.buildZoneText", "TRP3_API.Map.getCurrentZoneText");
 
 -- TRP3 Events API
-TRP3_API.events = setUpAPIDeprecatedWarning(TRP3_API.Events, "Events", "TRP3_API.events", "TRP3_API.Events");
+TRP3_API.events = Deprecated.setUpAPIDeprecatedWarning(TRP3_API.Events, "Events", "TRP3_API.events", "TRP3_API.Events");
 -- Copy events to main table, as they used to be placed there before
 for k, v in pairs(TRP3_API.Events.EVENTS) do
 	TRP3_API.events[k] = v;
 end
 
--- Configuration API
-TRP3_API.configuration = setUpAPIDeprecatedWarning(TRP3_API.Configuration, "Configuration", "TRP3_API.configuration", "TRP3_API.Configuration");
-
--- Configuration API
-TRP3_API.slash = setUpAPIDeprecatedWarning(TRP3_API.Slash, "Slash", "TRP3_API.slash", "TRP3_API.Slash");
+TRP3_API.slash = Deprecated.setUpAPIDeprecatedWarning(TRP3_API.Slash, "Slash", "TRP3_API.slash", "TRP3_API.Slash");
 
 -- UI Animations
-TRP3_API.ui.misc.playAnimation = setUpDeprecatedFunctionWarning(TRP3_API.Animations.playAnimation, "TRP3_API.ui.misc.playAnimation", "TRP3_API.Animations.playAnimation");
-
--- Globals
-TRP3_API.globals = setUpAPIDeprecatedWarning(TRP3_API.Globals, "Globals", "TRP3_API.globals", "TRP3_API.Globals");
-
--- Communications API
-TRP3_API.communication = setUpAPIDeprecatedWarning(TRP3_API.Communications, "Communications", "TRP3_API.communication", "TRP3_API.Communications");
-TRP3_API.communication.broadcast = setUpAPIDeprecatedWarning(TRP3_API.Broadcast, "Broadcast", "TRP3_API.communication.broadcast", "TRP3_API.Broadcast");
+TRP3_API.ui.misc.playAnimation = Deprecated.setUpDeprecatedFunctionWarning(TRP3_API.Animations.playAnimation, "TRP3_API.ui.misc.playAnimation", "TRP3_API.Animations.playAnimation");
 
 -- Popups
-TRP3_API.popup = setUpAPIDeprecatedWarning(TRP3_API.Popups, "Popups", "TRP3_API.popup", "TRP3_API.Popups");
+TRP3_API.popup = Deprecated.setUpAPIDeprecatedWarning(TRP3_API.Popups, "Popups", "TRP3_API.popup", "TRP3_API.Popups");
 
 -- Frames API
-TRP3_API.ui.frame = setUpAPIDeprecatedWarning(TRP3_API.Frames, "Frames", "TRP3_API.ui.frame", "TRP3_API.Frames");
-TRP3_API.ui.frame.setupMove = setUpDeprecatedFunctionWarning(TRP3_API.Frames.makeMovable, "TRP3_API.ui.frame.setupMove", "TRP3_API.Frames.makeMovable");
-TRP3_API.ui.frame.configureHoverFrame = setUpDeprecatedFunctionWarning(TRP3_API.Frames.configureHoverFrame, "TRP3_API.ui.frame.configureHoverFrame", "TRP3_API.Frames.configureHoverFrame");
+TRP3_API.ui.frame = Deprecated.setUpAPIDeprecatedWarning(TRP3_API.Frames, "Frames", "TRP3_API.ui.frame", "TRP3_API.Frames");
+TRP3_API.ui.frame.initResize = Deprecated.setUpDeprecatedFunctionWarning(TRP3_API.Frames.makeResizable, "TRP3_API.ui.frame.initResize", "TRP3_API.Frames.makeResizable");
+TRP3_API.ui.frame.setupMove = Deprecated.setUpDeprecatedFunctionWarning(TRP3_API.Frames.makeMovable, "TRP3_API.ui.frame.setupMove", "TRP3_API.Frames.makeMovable");
+TRP3_API.ui.frame.configureHoverFrame = Deprecated.setUpDeprecatedFunctionWarning(TRP3_API.Frames.configureHoverFrame, "TRP3_API.ui.frame.configureHoverFrame", "TRP3_API.Frames.configureHoverFrame");
+
+-- Tooltips
+TRP3_API.ui.tooltip = Deprecated.setUpAPIDeprecatedWarning(TRP3_API.Tooltips, "Tooltips", "TRP3_API.ui.tooltip", "TRP3_API.Tooltips");

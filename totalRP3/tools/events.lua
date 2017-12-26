@@ -86,7 +86,7 @@ Events.EVENTS = {
 local REGISTERED_EVENTS = {};
 
 function Events.registerEvent(event)
-	assert(isType(event, "text", "event"));
+	assert(isType(event, "string", "event"));
 	assert(not REGISTERED_EVENTS[event], "Event already registered.");
 	REGISTERED_EVENTS[event] = {};
 end
@@ -97,7 +97,7 @@ for event, eventID in pairs(Events.EVENTS) do
 end
 
 function Events.listenToEvent(event, handler)
-	assert(isType(event, "text", "event"));
+	assert(isType(event, "string", "event"));
 	assert(REGISTERED_EVENTS[event], "Unknown event: " .. tostring(event));
 	assert(isType(handler, "function", "handler"));
 	tinsert(REGISTERED_EVENTS[event], handler);
@@ -111,7 +111,7 @@ function Events.listenToEvents(events, handler)
 end
 
 function Events.fireEvent(event, ...)
-	assert(isType(event, "text", "event"));
+	assert(isType(event, "string", "event"));
 	assert(REGISTERED_EVENTS[event], "Unknown event: " .. tostring(event));
 	for _, handler in pairs(REGISTERED_EVENTS[event]) do
 		handler(...);

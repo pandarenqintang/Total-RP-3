@@ -19,8 +19,6 @@
 		limitations under the License.
 	-->
 
-	<Include file="tooltips\tooltips.xml"/>
-
 	<!-- Common close button  -->
 	<Button name="TRP3_CloseButton" inherits="UIPanelCloseButton, TRP3_MainTooltipMouseOverScripts" virtual="true">
 		<Scripts>

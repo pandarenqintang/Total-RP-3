@@ -19,8 +19,6 @@
 
 local _, TRP3_API = ...;
 
--- Fixed some typos in the English localization - Paul Corlay
-
 local LOCALE_EN = {
 	locale = "enUS",
 	localeText = "English",

@@ -25,6 +25,7 @@ local _, TRP3_API = ...;
 
 local Broadcast = {};
 TRP3_API.Broadcast = Broadcast;
+TRP3_API.communication.broadcast = TRP3_API.Deprecated.setUpAPIDeprecatedWarning(TRP3_API.Broadcast, "Broadcast", "TRP3_API.communication.broadcast", "TRP3_API.Broadcast");
 
 -- WoW imports
 local wipe = wipe;
@@ -52,7 +53,7 @@ local loc = TRP3_API.loc;
 local GameEvents = TRP3_API.GameEvents;
 local Events = TRP3_API.Events;
 local Messages = TRP3_API.Messages;
-local Communications = TRP3_API.Communication;
+local Communications = TRP3_API.Communications;
 local Globals = TRP3_API.Globals;
 local Strings = TRP3_API.Strings;
 

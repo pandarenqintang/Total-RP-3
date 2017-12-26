@@ -50,7 +50,7 @@ Events.listenToEvent(Events.EVENTS.WORKFLOW_ON_LOADED, function()
 end);
 
 local function getTooltipSize()
-	return TRP3_API.Configuration.getConfigValue(TRP3_API.Configuration.KEYS.CONFIG_TOOLTIP_SIZE) or 11;
+	return TRP3_API.Configuration.getValue(TRP3_API.Configuration.KEYS.CONFIG_TOOLTIP_SIZE) or 11;
 end
 
 

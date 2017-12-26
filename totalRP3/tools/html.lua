@@ -96,7 +96,6 @@ local SIMPLE_REPLACEMENTS = {
 	[TRP3_TEXT_TAGS.PARAGRAPH_CENTER] = HTML_TAGS.PARAGRAPH_CENTER,
 	[TRP3_TEXT_TAGS.PARAGRAPH_RIGHT] = HTML_TAGS.PARAGRAPH_RIGHT,
 	[TRP3_TEXT_TAGS.END_OF_PARAGRAPH] = HTML_TAGS.END_OF_PARAGRAPH,
-	[TRP3_TEXT_TAGS.END_OF_LINE] = HTML_TAGS.END_OF_LINE,
 }
 
 -- List of the supporterd Markdown tags
@@ -111,17 +110,11 @@ local MARKDOWN_TAGS = {
 	LINK = "%[(.-)%]%((.-)%)", -- [Google](www.google.com)
 }
 
-local ESCAPED_HTML_CHARACTERS = {
-	["<"] = "&lt;",
-	[">"] = "&gt;",
-	["\""] = "&quot;",
-};
-
 local LINKS_COLOR = Colors.COLORS.GREEN;
 
 local function titleTag(titleLevel, title)
-	return strconcat("\n", format(HTML_TAGS.TITLE, titleLevel), strtrim(title), HTML_TAGS.END_OF_TITLE);
-end;
+	return "\n<h" .. titleLevel .. ">" .. strtrim(title) .. "</h" .. titleLevel .. ">";
+end
 
 local function markdownTitleTag(titleChars, title)
 	return titleTag(#titleChars, title);
@@ -161,7 +154,30 @@ local function generateHTMLLink(linkText, url, linkColor)
 	return format(HTML_TAGS.LINK, url, linkText);
 end
 
+local ESCAPED_HTML_CHARACTERS = {
+	["<"] = "&lt;",
+	[">"] = "&gt;",
+	["\""] = "&quot;",
+};
+
+local structureTags = {
+	["{h(%d)}"] = "<h%1>",
+	["{h(%d):c}"] = "<h%1 align=\"center\">",
+	["{h(%d):r}"] = "<h%1 align=\"right\">",
+	["{/h(%d)}"] = "</h%1>",
+
+	["{p}"] = "<P>",
+	["{p:c}"] = "<P align=\"center\">",
+	["{p:r}"] = "<P align=\"right\">",
+	["{/p}"] = "</P>",
+};
+
 function HTML.convertTRP3TagsIntoHTML(text, noColor)
+
+	local linkColor = "|cff00ff00";
+	if noColor then
+		linkColor = "";
+	end
 
 	-- 1) Replacement : & character
 	text = gsub(text, "&", "&amp;");
@@ -172,12 +188,19 @@ function HTML.convertTRP3TagsIntoHTML(text, noColor)
 	end
 
 	-- 3) Replace Markdown
-	for _, titleTag in pairs(MARKDOWN_TAGS) do
-		text = gsub(text, titleTag, markdownTitleTag);
-	end
+	local titleFunction = function(titleChars, title)
+		local titleLevel = #titleChars;
+		return "\n<h" .. titleLevel .. ">" .. strtrim(title) .. "</h" .. titleLevel .. ">";
+	end;
+
+	-- 3) Replace Markdown
+	text = gsub(text, "^(#+)(.-)\n", titleFunction);
+	text = gsub(text, "\n(#+)(.-)\n", titleFunction);
+	text = gsub(text, "\n(#+)(.-)$", titleFunction);
+	text = gsub(text, "^(#+)(.-)$", titleFunction);
 
 	-- 4) Replacement : text tags
-	for pattern, replacement in pairs(SIMPLE_REPLACEMENTS) do
+	for pattern, replacement in pairs(structureTags) do
 		text = gsub(text, pattern, replacement);
 	end
 
@@ -222,39 +245,41 @@ function HTML.convertTRP3TagsIntoHTML(text, noColor)
 	local finalText = "";
 	for _, line in pairs(tab) do
 
-		-- If there is absolutely no tag in the text, it needs to at least be inside a <P> tag
-		if not find(line, "<") then
-			line = HTML_TAGS.PARAGRAPH .. line .. HTML_TAGS.END_OF_PARAGRAPH;
+		if not line:find("<") then
+			line = "<P>" .. line .. "</P>";
 		end
+		line = line:gsub("\n","<br/>");
 
-		-- Replace all end of lines with the <br/> tag
-		line = gsub(line, TRP3_TEXT_TAGS.END_OF_LINE,HTML_TAGS.END_OF_LINE);
+		line = line:gsub("{img%:(.-)%:(.-)%:(.-)%}",
+		"</P><img src=\"%1\" align=\"center\" width=\"%2\" height=\"%3\"/><P>");
 
-		-- Replace TRP3 image tags
-		line = gsub(line, TRP3_TEXT_TAGS.IMAGE, generateHTMLImage);
-
-		-- Markdown styled images ![texture path](size)
-		line = gsub(line, MARKDOWN_TAGS.TEXTURE, markdownTextureToHTML);
-
-		-- Markdown styled links [link text](url)
-		line = gsub(line, MARKDOWN_TAGS.LINK, function(linkText, url)
-			generateHTMLLink(linkText, url, not noColor and LINKS_COLOR)
-		end );
-
-		-- TRP3 styled links
-		line = gsub(line, TRP3_TEXT_TAGS.LINK, function(url, linkText)
-			generateHTMLLink(linkText, url, not noColor and LINKS_COLOR);
+		line = line:gsub("%!%[(.-)%]%((.-)%)", function(icon, size)
+			if icon:find("\\") then
+				local width, height;
+				if size:find("%,") then
+					width, height = strsplit(",", size);
+				else
+					width = tonumber(size) or 128;
+					height = width;
+				end
+				return "</P><img src=\"".. icon .. "\" align=\"center\" width=\"".. width .. "\" height=\"" .. height .. "\"/><P>";
+			end
+			return Textures.icon(icon, tonumber(size) or 25);
 		end);
 
-		-- Twitter links
-		line = gsub(line, TRP3_TEXT_TAGS.TWITTER_LINK, function(twitterHandle, twitterUsername)
-			generateHTMLLink(twitterUsername, "twitter" .. twitterHandle, not noColor and Colors.COLORS.TWITTER);
-		end);
+		line = line:gsub("%[(.-)%]%((.-)%)",
+		"<a href=\"%2\">" .. linkColor .. "[%1]|r</a>");
+
+		line = line:gsub("{link%*(.-)%*(.-)}",
+		"<a href=\"%1\">" .. linkColor .. "[%2]|r</a>");
+
+		line = line:gsub("{twitter%*(.-)%*(.-)}",
+		"<a href=\"twitter%1\">|cff61AAEE%2|r</a>");
 
 		finalText = finalText .. line;
 	end
 
 	finalText = Strings.convertTextTags(finalText);
 
-	return HTML_START .. finalText .. HTML_END;
+	return "<HTML><BODY>" .. finalText .. "</BODY></HTML>";
 end

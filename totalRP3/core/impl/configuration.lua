@@ -27,6 +27,8 @@ local _, TRP3_API = ...;
 local Configuration = {};
 TRP3_API.Configuration = Configuration;
 
+TRP3_API.configuration = TRP3_API.Deprecated.setUpAPIDeprecatedWarning(TRP3_API.Configuration, "Configuration", "TRP3_API.configuration", "TRP3_API.Configuration");
+
 -- imports
 local tonumber = tonumber;
 local math = math;
@@ -441,12 +443,12 @@ Events.listenToEvent(Events.EVENTS.WORKFLOW_ON_LOAD, function()
 		tinsert(localeTab, { Locale.getLocaleText(locale), locale });
 	end
 
-	Events.registerConfigKey(Configuration.KEYS.HEAVY_PROFILE_ALERT, true);
-	Events.registerConfigKey(Configuration.KEYS.NEW_VERSION_ALERT, true);
-	Events.registerConfigKey(Configuration.KEYS.UI_SOUNDS, true);
-	Events.registerConfigKey(Configuration.KEYS.UI_ANIMATIONS, true);
-	Events.registerConfigKey(Configuration.KEYS.USE_BROADCAST_CHANNEL, true);
-	Events.registerConfigKey(Configuration.KEYS.BROADCAST_CHANNEL_NAME, "xtensionxtooltip2");
+	Configuration.registerConfigKey(Configuration.KEYS.HEAVY_PROFILE_ALERT, true);
+	Configuration.registerConfigKey(Configuration.KEYS.NEW_VERSION_ALERT, true);
+	Configuration.registerConfigKey(Configuration.KEYS.UI_SOUNDS, true);
+	Configuration.registerConfigKey(Configuration.KEYS.UI_ANIMATIONS, true);
+	Configuration.registerConfigKey(Configuration.KEYS.USE_BROADCAST_CHANNEL, true);
+	Configuration.registerConfigKey(Configuration.KEYS.BROADCAST_CHANNEL_NAME, "xtensionxtooltip2");
 
 	-- Build widgets
 	Configuration.CONFIG_STRUCTURE_GENERAL = {
@@ -528,3 +530,6 @@ function Configuration.constructConfigPage()
 	Configuration.registerConfigurationPage(Configuration.CONFIG_FRAME_PAGE);
 	Configuration.registerConfigurationPage(Configuration.CONFIG_STRUCTURE_GENERAL);
 end
+
+
+TRP3_API.configuration.getConfigValue = TRP3_API.Deprecated.setUpDeprecatedFunctionWarning(Configuration.getValue, "TRP3_API.configuration.getConfigValue", "TRP3_API.Configuration.getValue");
